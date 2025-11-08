@@ -4,32 +4,38 @@ const team = [
   {
     name: "Dr. Hassan Ibrahim Sani",
     role: "MD/CEO",
-    image: "Portrait of Dr. Hassan Ibrahim Sani MD/CEO of Shelter Setters",
+    alt: "Portrait of Dr. Hassan Ibrahim Sani MD/CEO of Shelter Setters",
+    image:"/ceo.png",
   },
   {
     name: "Ariyo Ojo Tosin",
     role: "Human Resource Manager",
-    image: "Portrait of Ariyo Ojo Tosin Human Resource Manager",
+    alt: "Portrait of Ariyo Ojo Tosin Human Resource Manager",
+    image:"/ariyo.png",
   },
   {
     name: "Winner Kelechi N.",
     role: "Management Consultant",
-    image: "Portrait of Winner Kelechi N. Management Consultant",
+    alt: "Portrait of Winner Kelechi N. Management Consultant",
+    image:"/winner.png",
   },
   {
     name: "Aliy Ibrahim",
     role: "Director",
-    image: "Portrait of Aliy Ibrahim Director",
+    alt: "Portrait of Aliy Ibrahim Director",
+    image:"/default.png",
   },
   {
     name: "Hamzah Ibrahim",
     role: "Director",
-    image: "Portrait of Hamzah Ibrahim Director",
+    alt: "Portrait of Hamzah Ibrahim Director",
+    image:"/default.png",
   },
   {
     name: "Habeeb Hamisu",
     role: "General Manager",
-    image: "Portrait of Habeeb Hamisu General Manager",
+    alt: "Portrait of Habeeb Hamisu General Manager",
+    image:"/default.png",
   },
 ]
 
@@ -49,9 +55,9 @@ export default function OurTeam() {
             <div key={index} className="text-center">
               <div className="relative h-64 mb-6 rounded-2xl overflow-hidden bg-[#E9EEF0]">
                 <img
-                  src={`/.jpg?height=400&width=400&query=${member.image}`}
-                  alt={member.image}
-                  className="w-full h-full object-cover"
+                  src={`${member.image}`}
+                  alt={member.alt}
+                  className="w-full h-full object-cover rounded-2xl p-2"
                 />
               </div>
               <h3 className="text-xl font-bold mb-1" style={{ color: "#0E293B" }}>

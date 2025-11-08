@@ -1,15 +1,74 @@
 const mongoose = require("mongoose")
 
-const connectDatabase = async () => {
-  const mongoUri = process.env.MONGODB_URI
+const config = require(".")
+const { log, error: logError } = require("../utils/logger")
 
-  if (!mongoUri) {
-    throw new Error("MONGODB_URI is not defined")
-  }
+let memoryServer
+let MongoMemoryServerModule
 
-  await mongoose.connect(mongoUri)
+const connectWithUri = async (uri) => {
+  await mongoose.connect(uri, {
+    autoIndex: config.env !== "production",
+  })
+  log(`Connected to MongoDB${memoryServer ? " (in-memory)" : ""}`)
   return mongoose.connection
 }
 
-module.exports = connectDatabase
+const ensureMemoryServerModule = () => {
+  if (!MongoMemoryServerModule) {
+    try {
+      // eslint-disable-next-line global-require
+      MongoMemoryServerModule = require("mongodb-memory-server")
+    } catch (err) {
+      throw new Error(
+        "mongodb-memory-server is not installed. Install it (`npm install -D mongodb-memory-server`) or disable USE_IN_MEMORY_DB."
+      )
+    }
+  }
+  return MongoMemoryServerModule.MongoMemoryServer
+}
+
+const startInMemoryServer = async () => {
+  const MongoMemoryServer = ensureMemoryServerModule()
+  memoryServer = await MongoMemoryServer.create()
+  const uri = memoryServer.getUri()
+  log("Starting in-memory MongoDB instance")
+  return connectWithUri(uri)
+}
+
+const connectDatabase = async () => {
+  if (config.mongoUri) {
+    try {
+      return await connectWithUri(config.mongoUri)
+    } catch (err) {
+      logError("Failed to connect to MongoDB:", err.message)
+      if (!config.useInMemoryDb) {
+        throw err
+      }
+      log("Falling back to in-memory MongoDB instance")
+    }
+  } else if (!config.useInMemoryDb) {
+    throw new Error("MONGODB_URI is not defined and USE_IN_MEMORY_DB is disabled")
+  }
+
+  if (config.useInMemoryDb) {
+    return startInMemoryServer()
+  }
+
+  throw new Error("Unable to establish a MongoDB connection")
+}
+
+const disconnectDatabase = async () => {
+  await mongoose.disconnect()
+  if (memoryServer) {
+    await memoryServer.stop()
+    memoryServer = null
+    log("In-memory MongoDB instance stopped")
+  }
+}
+
+module.exports = {
+  connectDatabase,
+  disconnectDatabase,
+}
 

@@ -19,6 +19,9 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Shelter Setters | Premium Aluminium & Roofing Solutions in Nigeria",
+  icons: {
+    icon: "/logo3.png",
+  },
   description:
     "Expert aluminium production, roofing sheets, window fabrication, and building finishing services. Over 20 years of excellence serving Nigeria. ISO certified quality guaranteed.",
   keywords:

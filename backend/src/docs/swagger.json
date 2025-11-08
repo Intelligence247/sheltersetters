@@ -1,0 +1,700 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Shelter Setters API",
+    "version": "1.0.0",
+    "description": "REST API powering the Shelter Setters website and internal admin tools."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5050",
+      "description": "Local development"
+    },
+    {
+      "url": "{backendBaseUrl}",
+      "description": "Configured backend URL",
+      "variables": {
+        "backendBaseUrl": {
+          "default": "https://api.example.com"
+        }
+      }
+    }
+  ],
+  "tags": [
+    { "name": "System", "description": "Infrastructure and monitoring" },
+    { "name": "Auth", "description": "Administrator authentication" },
+    { "name": "Content", "description": "Public website content" },
+    { "name": "Contact", "description": "Contact form submissions" }
+  ],
+  "paths": {
+    "/status": {
+      "get": {
+        "tags": ["System"],
+        "summary": "Service status",
+        "description": "Returns basic health information for uptime checks.",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": ["System"],
+        "summary": "API health check",
+        "description": "Returns uptime and timestamp details for the API.",
+        "responses": {
+          "200": {
+            "description": "Healthy response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" },
+                    "uptime": { "type": "number", "example": 125.342 },
+                    "timestamp": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register new admin",
+        "description": "Creates an administrator account. Optional registration secret can be required via configuration.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Admin account created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminResponse" }
+              }
+            }
+          },
+          "403": { "$ref": "#/components/responses/ForbiddenError" },
+          "409": { "$ref": "#/components/responses/ConflictError" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Admin login",
+        "description": "Authenticates an administrator and returns a JWT token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Current admin profile",
+        "description": "Returns profile data for the authenticated administrator.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Profile data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/content/home": {
+      "get": {
+        "tags": ["Content"],
+        "summary": "Homepage content",
+        "description": "Aggregated services, news, projects and team content for the public homepage.",
+        "responses": {
+          "200": {
+            "description": "Homepage payload",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HomeContentResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/services": {
+      "get": {
+        "tags": ["Content"],
+        "summary": "Services list",
+        "responses": {
+          "200": {
+            "description": "List of services",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ServicesResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/news": {
+      "get": {
+        "tags": ["Content"],
+        "summary": "News articles",
+        "responses": {
+          "200": {
+            "description": "List of news items",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NewsResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/projects": {
+      "get": {
+        "tags": ["Content"],
+        "summary": "Featured projects",
+        "responses": {
+          "200": {
+            "description": "Projects payload",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProjectsResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/team": {
+      "get": {
+        "tags": ["Content"],
+        "summary": "Team members",
+        "responses": {
+          "200": {
+            "description": "Team members payload",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TeamResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contact": {
+      "post": {
+        "tags": ["Contact"],
+        "summary": "Submit contact form",
+        "description": "Public endpoint used by the website contact form.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ContactRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message accepted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ContactResponse" }
+              }
+            }
+          },
+          "422": { "$ref": "#/components/responses/ValidationError" }
+        }
+      },
+      "get": {
+        "tags": ["Contact"],
+        "summary": "List contact messages",
+        "description": "Admin-only endpoint with pagination support.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["new", "in_progress", "closed"] },
+            "description": "Filter by ticket status"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1 },
+            "description": "Page number (default 1)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100 },
+            "description": "Results per page (default 20)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated messages",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ContactListResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/contact/{id}": {
+      "patch": {
+        "tags": ["Contact"],
+        "summary": "Update message status",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" },
+            "description": "MongoDB object ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ContactStatusRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated message",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ContactResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string", "example": "Success" },
+          "data": { "type": "object" }
+        }
+      },
+      "Admin": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string", "example": "65a01f65c3f4d8fce5fe9bd2" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "role": { "type": "string", "enum": ["admin", "editor", "viewer"] },
+          "isActive": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "format": "password", "minLength": 8 },
+          "role": { "type": "string", "enum": ["admin", "editor", "viewer"] },
+          "registrationSecret": { "type": "string" }
+        }
+      },
+      "AdminResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "admin": { "$ref": "#/components/schemas/Admin" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "format": "password" }
+        }
+      },
+      "LoginResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string" },
+                  "admin": { "$ref": "#/components/schemas/Admin" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Service": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "slug": { "type": "string" },
+          "summary": { "type": "string" },
+          "description": { "type": "string" },
+          "icon": { "type": "string" },
+          "imageUrl": { "type": "string" },
+          "order": { "type": "integer" },
+          "isActive": { "type": "boolean" }
+        }
+      },
+      "News": {
+        "type": "object",
+        "properties": {
+          "headline": { "type": "string" },
+          "summary": { "type": "string" },
+          "imageUrl": { "type": "string" },
+          "altText": { "type": "string" },
+          "publishedAt": { "type": "string", "format": "date-time" },
+          "isFeatured": { "type": "boolean" }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "slug": { "type": "string" },
+          "summary": { "type": "string" },
+          "description": { "type": "string" },
+          "category": { "type": "string" },
+          "location": { "type": "string" },
+          "imageUrl": { "type": "string" },
+          "isFeatured": { "type": "boolean" }
+        }
+      },
+      "TeamMember": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "bio": { "type": "string" },
+          "imageUrl": { "type": "string" }
+        }
+      },
+      "HomeContentResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "services": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Service" }
+                  },
+                  "news": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/News" }
+                  },
+                  "projects": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Project" }
+                  },
+                  "team": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/TeamMember" }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ServicesResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "services": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Service" }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "NewsResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "news": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/News" }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ProjectsResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "projects": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Project" }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "TeamResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "team": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/TeamMember" }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ContactRequest": {
+        "type": "object",
+        "required": ["name", "email", "message"],
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string" },
+          "message": { "type": "string", "minLength": 10 }
+        }
+      },
+      "ContactMessage": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string" },
+          "message": { "type": "string" },
+          "status": { "type": "string", "enum": ["new", "in_progress", "closed"] },
+          "respondedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "notes": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ContactResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "message": { "$ref": "#/components/schemas/ContactMessage" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ContactListResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "messages": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/ContactMessage" }
+                  },
+                  "pagination": {
+                    "type": "object",
+                    "properties": {
+                      "total": { "type": "integer" },
+                      "page": { "type": "integer" },
+                      "limit": { "type": "integer" },
+                      "pages": { "type": "integer" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ContactStatusRequest": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["new", "in_progress", "closed"] },
+          "notes": { "type": "string" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "error" },
+          "message": { "type": "string" },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": { "type": "string" },
+                "message": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Authentication required",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Access denied",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "ConflictError": {
+        "description": "Resource conflict",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Validation failed",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      }
+    }
+  }
+}
+

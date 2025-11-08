@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
+import Image from "next/image"
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
@@ -20,10 +21,9 @@ export default function Navigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg transition-colors"
-              style={{ backgroundColor: "var(--color-primary-900)" }}
+              className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-lg transition-colors"
             >
-              SS
+        <Image src={"/logo3.png"} alt="logo" height={45} width={45}/>
             </div>
             <span className="font-bold text-lg hidden sm:inline" style={{ color: "var(--color-primary-900)" }}>
               Shelter Setters

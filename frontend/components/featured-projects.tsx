@@ -5,29 +5,34 @@ const projects = [
     title: "Residential Complex Roofing",
     location: "Ilorin, Kwara State",
     year: "2024",
-    image: "Shelter Setters completed residential roofing project with modern aluminium design",
+    alt: "Shelter Setters completed residential roofing project with modern aluminium design",
     description: "Complete roofing installation using premium aluminium sheets",
+    image: "/residential.png",
   },
   {
     title: "Commercial Office Fitout",
     location: "Lagos, Nigeria",
     year: "2023",
-    image: "Completed aluminium window and glass partitioning installation for commercial office building",
+    alt: "Completed aluminium window and glass partitioning installation for commercial office building",
     description: "Glass partitioning and aluminium window systems",
+    image: "/glass-house.png",
   },
   {
     title: "Industrial Facility Renovation",
     location: "Kaduna Industrial Estate",
     year: "2023",
-    image: "Industrial aluminium roofing and cladding solution for factory",
+    alt: "Industrial aluminium roofing and cladding solution for factory",
     description: "Large-scale roofing and cladding project",
+    image: "/cladding.png",
   },
   {
     title: "Luxury Residential Build",
     location: "Abuja, Nigeria",
     year: "2024",
-    image: "High-end residential project featuring custom aluminium facades and window systems",
+    alt: "High-end residential project featuring custom aluminium facades and window systems",
     description: "Premium architectural aluminium solutions",
+    image: "/glass-partition.png",
+
   },
 ]
 
@@ -47,8 +52,8 @@ export default function FeaturedProjects() {
             <div key={index} className="card group overflow-hidden hover:shadow-xl">
               <div className="relative h-48 bg-[#E9EEF0] rounded-lg overflow-hidden mb-4">
                 <img
-                  src={`/.jpg?height=300&width=400&query=${project.image}`}
-                  alt={project.image}
+                  src={`${project.image}`}
+                  alt={project.alt}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
               </div>

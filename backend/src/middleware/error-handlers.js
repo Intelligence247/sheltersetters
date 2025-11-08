@@ -1,16 +1,24 @@
-const notFoundHandler = (req, res, next) => {
-  res.status(404).json({
-    status: "error",
-    message: `Resource not found: ${req.originalUrl}`,
-  })
+const ApiError = require("../utils/api-error")
+const { error: logError } = require("../utils/logger")
+
+const notFoundHandler = (req, _res, next) => {
+  next(new ApiError(404, `Resource not found: ${req.originalUrl}`))
 }
 
 // eslint-disable-next-line no-unused-vars
-const errorHandler = (err, req, res, next) => {
-  const status = err.status || 500
+const errorHandler = (err, _req, res, _next) => {
+  const status = err.statusCode || err.status || 500
+  const message = err.message || "Internal Server Error"
+  const errors = err.errors || []
+
+  if (status >= 500) {
+    logError("Unhandled error:", err)
+  }
+
   res.status(status).json({
     status: "error",
-    message: err.message || "Internal Server Error",
+    message,
+    errors,
   })
 }
 
