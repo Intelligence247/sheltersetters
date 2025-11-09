@@ -27,30 +27,29 @@ const reasons = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="section-py bg-[#FBFCFD]" id="about">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-        <div className="text-center mb-16">
+    <section className="section-py reason-section" id="about">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
+        <div className="mb-16 text-center">
           <h2 className="heading-lg mb-4">Why Choose Shelter Setters</h2>
-          <p className="body-lg max-w-2xl mx-auto">
+          <p className="body-lg mx-auto max-w-2xl reason-subtitle">
             We've built our reputation on quality, reliability, and customer satisfaction
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {reasons.map((item, index) => {
             const Icon = item.icon
             return (
-              <div key={index} className="card group hover:shadow-xl" style={{ animationDelay: `${index * 0.1}s` }}>
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-colors"
-                  style={{ backgroundColor: "#E9EEF0" }}
-                >
-                  <Icon className="w-7 h-7" style={{ color: "#3F7A89" }} />
+              <div
+                key={item.title}
+                className="card reason-card group"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="reason-icon mb-4 flex h-14 w-14 items-center justify-center rounded-xl transition-colors group-hover:opacity-90">
+                  <Icon className="h-7 w-7" />
                 </div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: "#0E293B" }}>
-                  {item.title}
-                </h3>
-                <p className="body-sm">{item.description}</p>
+                <h3 className="reason-title mb-2 text-lg font-bold">{item.title}</h3>
+                <p className="reason-text body-sm">{item.description}</p>
               </div>
             )
           })}

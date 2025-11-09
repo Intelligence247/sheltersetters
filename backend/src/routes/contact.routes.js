@@ -5,6 +5,7 @@ const {
   submitContactForm,
   getMessages,
   changeMessageStatus,
+  replyToContactMessage,
 } = require("../controllers/contact.controller")
 const validateRequest = require("../middleware/validate-request")
 const { authenticate, authorize } = require("../middleware/auth")
@@ -55,6 +56,19 @@ router.patch(
   ],
   validateRequest,
   changeMessageStatus
+)
+
+router.post(
+  "/:id/reply",
+  authenticate,
+  authorize("admin", "editor"),
+  [
+    param("id").isMongoId().withMessage("Valid message id is required"),
+    body("reply").isLength({ min: 5 }).withMessage("Reply must be at least 5 characters"),
+    body("status").optional().isIn(["new", "in_progress", "closed"]).withMessage("Invalid status"),
+  ],
+  validateRequest,
+  replyToContactMessage
 )
 
 module.exports = router

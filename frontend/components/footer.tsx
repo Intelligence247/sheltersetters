@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react"
+import Image from "next/image"
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -15,10 +16,8 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg"
-                style={{ backgroundColor: "#BD5A00" }}
-              >
-                SS
+                className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg">
+                <Image src={"/logo3.png"} alt="logo" height={45} width={45}/>
               </div>
               <span className="font-bold text-lg">Shelter Setters</span>
             </div>

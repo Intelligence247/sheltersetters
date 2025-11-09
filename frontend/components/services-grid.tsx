@@ -50,47 +50,37 @@ const services = [
 
 export default function ServicesGrid() {
   return (
-    <section className="section-py bg-white" id="services">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-        <div className="text-center mb-16">
+    <section className="section-py services-section" id="services">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
+        <div className="mb-16 text-center">
           <h2 className="heading-lg mb-4">Our Services</h2>
-          <p className="body-lg max-w-2xl mx-auto">Comprehensive aluminium and building solutions for every need</p>
+          <p className="body-lg mx-auto max-w-2xl services-subtitle">
+            Comprehensive aluminium and building solutions for every need
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => {
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {services.map((service) => {
             const Icon = service.icon
             return (
-              <div
-                key={index}
-                className="group card hover:border-[#3F7A89] cursor-pointer hover:shadow-xl transition-all duration-300 overflow-hidden"
-              >
-                <div className="relative h-48 mb-4 overflow-hidden rounded-lg bg-gray-100">
+              <div key={service.id} className="card services-card group cursor-pointer overflow-hidden">
+                <div className="services-image relative mb-4 h-48 overflow-hidden rounded-lg">
                   <img
                     src={service.image || "/placeholder.svg"}
                     alt={service.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="services-image-overlay absolute inset-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
 
-                <div
-                  className="w-16 h-16 rounded-xl flex items-center justify-center mb-4"
-                  style={{ backgroundColor: "#E9EEF0" }}
-                >
-                  <Icon className="w-8 h-8" style={{ color: "#BD5A00" }} />
+                <div className="services-icon mb-4 flex h-16 w-16 items-center justify-center rounded-xl transition-colors group-hover:opacity-90">
+                  <Icon className="h-8 w-8" />
                 </div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: "#0E293B" }}>
-                  {service.title}
-                </h3>
-                <p className="body-base mb-6">{service.description}</p>
-                <Link
-                  href={`#${service.id}`}
-                  className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
-                  style={{ color: "#BD5A00" }}
-                >
+                <h3 className="services-title mb-3 text-xl font-bold">{service.title}</h3>
+                <p className="services-text body-base mb-6">{service.description}</p>
+                <Link href={`#${service.id}`} className="services-link inline-flex items-center gap-2 font-semibold">
                   Learn More
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="h-5 w-5" />
                 </Link>
               </div>
             )

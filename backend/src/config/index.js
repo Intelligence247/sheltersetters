@@ -41,6 +41,8 @@ const config = {
   jwt: {
     secret: process.env.JWT_SECRET || "change-me",
     expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+    refreshSecret: process.env.JWT_REFRESH_SECRET || `${process.env.JWT_SECRET || "change-me"}-refresh`,
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "30d",
   },
   email: {
     host: process.env.EMAIL_HOST,
@@ -56,6 +58,9 @@ const config = {
   },
   admin: {
     registrationSecret: process.env.ADMIN_REGISTRATION_SECRET,
+  },
+  auth: {
+    passwordResetTokenExpiryMinutes: parseNumber(process.env.PASSWORD_RESET_TOKEN_EXPIRY_MINUTES, 60),
   },
   useInMemoryDb: parseBoolean(process.env.USE_IN_MEMORY_DB, environment !== "production"),
 }

@@ -18,6 +18,10 @@ const authenticate = async (req, _res, next) => {
       throw new ApiError(401, "Invalid authentication credentials")
     }
 
+    if (decoded.version !== undefined && decoded.version !== admin.refreshTokenVersion) {
+      throw new ApiError(401, "Token revoked")
+    }
+
     req.user = admin
     next()
   } catch (err) {

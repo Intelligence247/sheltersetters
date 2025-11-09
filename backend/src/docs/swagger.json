@@ -24,7 +24,8 @@
     { "name": "System", "description": "Infrastructure and monitoring" },
     { "name": "Auth", "description": "Administrator authentication" },
     { "name": "Content", "description": "Public website content" },
-    { "name": "Contact", "description": "Contact form submissions" }
+    { "name": "Contact", "description": "Contact form submissions" },
+    { "name": "Admin Content", "description": "Admin management for services, news, projects, and team" }
   ],
   "paths": {
     "/status": {
@@ -91,7 +92,7 @@
             "description": "Admin account created",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AdminResponse" }
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
               }
             }
           },
@@ -141,6 +142,104 @@
               }
             }
           },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Refresh session tokens",
+        "description": "Exchanges a valid refresh token for new access and refresh tokens.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RefreshRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tokens refreshed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout current admin",
+        "description": "Revokes the current admin refresh tokens.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Request password reset",
+        "description": "Initiates a password reset email for the provided admin account.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ForgotPasswordRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset email dispatched if account exists",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Reset password",
+        "description": "Verifies a reset token and updates the administrator password.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ResetPasswordRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" },
           "401": { "$ref": "#/components/responses/UnauthorizedError" }
         }
       }
@@ -323,6 +422,454 @@
           "401": { "$ref": "#/components/responses/UnauthorizedError" },
           "404": { "$ref": "#/components/responses/NotFoundError" }
         }
+      },
+      "post": {
+        "tags": ["Contact"],
+        "summary": "Reply to contact message",
+        "description": "Send an email reply to the original requester and mark the conversation.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" },
+            "description": "Contact message id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ContactReplyRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reply recorded and email sent",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ContactResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
+      }
+    }
+    ,
+    "/api/admin/content/services": {
+      "get": {
+        "tags": ["Admin Content"],
+        "summary": "List services",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Service list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ServicesResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+      "post": {
+        "tags": ["Admin Content"],
+        "summary": "Create service",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ServiceAdminRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Service created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ServiceItemResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/admin/content/services/{id}": {
+      "patch": {
+        "tags": ["Admin Content"],
+        "summary": "Update service",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ServiceAdminRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Service updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ServiceItemResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
+      },
+      "delete": {
+        "tags": ["Admin Content"],
+        "summary": "Delete service",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service deleted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ServiceItemResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
+      }
+    },
+    "/api/admin/content/news": {
+      "get": {
+        "tags": ["Admin Content"],
+        "summary": "List news articles",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "News list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NewsResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+      "post": {
+        "tags": ["Admin Content"],
+        "summary": "Create news article",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NewsAdminRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "News article created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NewsItemResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/admin/content/news/{id}": {
+      "patch": {
+        "tags": ["Admin Content"],
+        "summary": "Update news article",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NewsAdminRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "News article updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NewsItemResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
+      },
+      "delete": {
+        "tags": ["Admin Content"],
+        "summary": "Delete news article",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "News article deleted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NewsItemResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
+      }
+    },
+    "/api/admin/content/projects": {
+      "get": {
+        "tags": ["Admin Content"],
+        "summary": "List projects",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Project list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProjectsResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+      "post": {
+        "tags": ["Admin Content"],
+        "summary": "Create project",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProjectAdminRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProjectItemResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/admin/content/projects/{id}": {
+      "patch": {
+        "tags": ["Admin Content"],
+        "summary": "Update project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProjectAdminRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Project updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProjectItemResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
+      },
+      "delete": {
+        "tags": ["Admin Content"],
+        "summary": "Delete project",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project deleted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProjectItemResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
+      }
+    },
+    "/api/admin/content/team": {
+      "get": {
+        "tags": ["Admin Content"],
+        "summary": "List team members",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Team list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TeamAdminResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+      "post": {
+        "tags": ["Admin Content"],
+        "summary": "Create team member",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TeamAdminRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Team member created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TeamMemberItemResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/admin/content/team/{id}": {
+      "patch": {
+        "tags": ["Admin Content"],
+        "summary": "Update team member",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TeamAdminRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Team member updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TeamMemberItemResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
+      },
+      "delete": {
+        "tags": ["Admin Content"],
+        "summary": "Delete team member",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Team member deleted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TeamMemberItemResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
       }
     }
   },
@@ -398,7 +945,9 @@
               "data": {
                 "type": "object",
                 "properties": {
-                  "token": { "type": "string" },
+                  "token": { "type": "string", "description": "Access token (alias for accessToken)" },
+                  "accessToken": { "type": "string" },
+                  "refreshToken": { "type": "string" },
                   "admin": { "$ref": "#/components/schemas/Admin" }
                 }
               }
@@ -419,6 +968,37 @@
           "isActive": { "type": "boolean" }
         }
       },
+      "ServiceAdminRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "slug": { "type": "string" },
+          "summary": { "type": "string" },
+          "description": { "type": "string" },
+          "icon": { "type": "string" },
+          "imageUrl": { "type": "string" },
+          "order": { "type": "integer" },
+          "ctaLabel": { "type": "string" },
+          "ctaUrl": { "type": "string" },
+          "isActive": { "type": "boolean" }
+        }
+      },
+      "ServiceItemResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "service": { "$ref": "#/components/schemas/Service" }
+                }
+              }
+            }
+          }
+        ]
+      },
       "News": {
         "type": "object",
         "properties": {
@@ -429,6 +1009,38 @@
           "publishedAt": { "type": "string", "format": "date-time" },
           "isFeatured": { "type": "boolean" }
         }
+      },
+      "NewsAdminRequest": {
+        "type": "object",
+        "properties": {
+          "headline": { "type": "string" },
+          "summary": { "type": "string" },
+          "body": { "type": "string" },
+          "imageUrl": { "type": "string" },
+          "altText": { "type": "string" },
+          "publishedAt": { "type": "string", "format": "date-time" },
+          "isFeatured": { "type": "boolean" },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "NewsItemResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "article": { "$ref": "#/components/schemas/News" }
+                }
+              }
+            }
+          }
+        ]
       },
       "Project": {
         "type": "object",
@@ -443,6 +1055,45 @@
           "isFeatured": { "type": "boolean" }
         }
       },
+      "ProjectAdminRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "slug": { "type": "string" },
+          "summary": { "type": "string" },
+          "description": { "type": "string" },
+          "category": { "type": "string" },
+          "location": { "type": "string" },
+          "imageUrl": { "type": "string" },
+          "gallery": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "metrics": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "completedAt": { "type": "string", "format": "date-time" },
+          "order": { "type": "integer" },
+          "isFeatured": { "type": "boolean" }
+        }
+      },
+      "ProjectItemResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "project": { "$ref": "#/components/schemas/Project" }
+                }
+              }
+            }
+          }
+        ]
+      },
       "TeamMember": {
         "type": "object",
         "properties": {
@@ -451,6 +1102,62 @@
           "bio": { "type": "string" },
           "imageUrl": { "type": "string" }
         }
+      },
+      "TeamAdminRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "bio": { "type": "string" },
+          "imageUrl": { "type": "string" },
+          "order": { "type": "integer" },
+          "isActive": { "type": "boolean" },
+          "socialLinks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "platform": { "type": "string" },
+                "url": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "TeamMemberItemResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "member": { "$ref": "#/components/schemas/TeamMember" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "TeamAdminResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "members": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/TeamMember" }
+                  }
+                }
+              }
+            }
+          }
+        ]
       },
       "HomeContentResponse": {
         "allOf": [
@@ -577,11 +1284,22 @@
           "email": { "type": "string", "format": "email" },
           "phone": { "type": "string" },
           "message": { "type": "string" },
+          "reply": { "type": "string" },
+          "repliedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "repliedBy": { "type": "string", "nullable": true },
           "status": { "type": "string", "enum": ["new", "in_progress", "closed"] },
           "respondedAt": { "type": "string", "format": "date-time", "nullable": true },
           "notes": { "type": "string" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ContactReplyRequest": {
+        "type": "object",
+        "required": ["reply"],
+        "properties": {
+          "reply": { "type": "string", "minLength": 5 },
+          "status": { "type": "string", "enum": ["new", "in_progress", "closed"] }
         }
       },
       "ContactResponse": {
@@ -634,6 +1352,45 @@
           "status": { "type": "string", "enum": ["new", "in_progress", "closed"] },
           "notes": { "type": "string" }
         }
+      },
+      "RefreshRequest": {
+        "type": "object",
+        "required": ["refreshToken"],
+        "properties": {
+          "refreshToken": { "type": "string" }
+        }
+      },
+      "ForgotPasswordRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "baseUrl": { "type": "string", "format": "uri", "description": "Optional override for the password reset link base URL" }
+        }
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "required": ["token", "password"],
+        "properties": {
+          "token": { "type": "string" },
+          "password": { "type": "string", "minLength": 8, "format": "password" }
+        }
+      },
+      "SuccessResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "success": { "type": "boolean", "example": true }
+                }
+              }
+            }
+          }
+        ]
       },
       "ErrorResponse": {
         "type": "object",

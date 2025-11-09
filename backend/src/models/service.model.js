@@ -47,6 +47,14 @@ const serviceSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+    },
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+    },
   },
   {
     timestamps: true,

@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { Mail, Phone, MapPin, Send } from "lucide-react"
 
 export default function ContactSection() {
@@ -13,38 +11,34 @@ export default function ContactSection() {
     message: "",
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle form submission here
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault()
     console.log(formData)
   }
 
   return (
-    <section className="section-py bg-white" id="contact">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Information */}
+    <section className="section-py contact-section" id="contact">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           <div>
             <h2 className="heading-lg mb-8">Get in Touch</h2>
 
             <div className="space-y-8">
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  <MapPin className="w-6 h-6" style={{ color: "#BD5A00" }} />
+              <div className="contact-item flex gap-4">
+                <div className="contact-icon flex-shrink-0">
+                  <MapPin className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: "#0E293B" }}>
-                    Visit Us
-                  </h3>
-                  <p className="body-base">
+                  <h3 className="contact-title mb-2 text-lg font-bold">Visit Us</h3>
+                  <p className="contact-text body-base">
                     Plot 4/6 Shelter Setters Street
                     <br />
                     Off Hajj Camp Road, Gaa Odota
@@ -56,25 +50,23 @@ export default function ContactSection() {
                 </div>
               </div>
 
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  <Phone className="w-6 h-6" style={{ color: "#BD5A00" }} />
+              <div className="contact-item flex gap-4">
+                <div className="contact-icon flex-shrink-0">
+                  <Phone className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: "#0E293B" }}>
-                    Call Us
-                  </h3>
-                  <p className="body-base mb-1">
+                  <h3 className="contact-title mb-2 text-lg font-bold">Call Us</h3>
+                  <p className="contact-text body-base mb-1">
                     <a href="tel:+234-9014476652" className="hover:underline">
                       +234 901 447 6652
                     </a>
                   </p>
-                  <p className="body-base mb-1">
+                  <p className="contact-text body-base mb-1">
                     <a href="tel:+234-9072629100" className="hover:underline">
                       +234 907 262 9100
                     </a>
                   </p>
-                  <p className="body-base">
+                  <p className="contact-text body-base">
                     <a href="tel:+234-7032552716" className="hover:underline">
                       +234 703 255 2716
                     </a>
@@ -82,15 +74,13 @@ export default function ContactSection() {
                 </div>
               </div>
 
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  <Mail className="w-6 h-6" style={{ color: "#BD5A00" }} />
+              <div className="contact-item flex gap-4">
+                <div className="contact-icon flex-shrink-0">
+                  <Mail className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: "#0E293B" }}>
-                    Email
-                  </h3>
-                  <p className="body-base">
+                  <h3 className="contact-title mb-2 text-lg font-bold">Email</h3>
+                  <p className="contact-text body-base">
                     <a href="mailto:info.ssaeltd@gmail.com" className="hover:underline">
                       info.ssaeltd@gmail.com
                     </a>
@@ -100,14 +90,11 @@ export default function ContactSection() {
             </div>
           </div>
 
-          {/* Contact Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <h3 className="text-2xl font-bold" style={{ color: "#0E293B" }}>
-              Send us a Message
-            </h3>
+          <form onSubmit={handleSubmit} className="contact-form space-y-6">
+            <h3 className="contact-form-title text-2xl font-bold">Send us a Message</h3>
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-2" style={{ color: "#0E293B" }}>
+              <label htmlFor="name" className="contact-label block text-sm font-medium">
                 Your Name
               </label>
               <input
@@ -117,13 +104,13 @@ export default function ContactSection() {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 rounded-lg border border-[#D8DEE0] focus:outline-none focus:border-[#3F7A89] transition-colors"
+                className="contact-input"
                 placeholder="John Doe"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: "#0E293B" }}>
+              <label htmlFor="email" className="contact-label block text-sm font-medium">
                 Email Address
               </label>
               <input
@@ -133,13 +120,13 @@ export default function ContactSection() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 rounded-lg border border-[#D8DEE0] focus:outline-none focus:border-[#3F7A89] transition-colors"
+                className="contact-input"
                 placeholder="john@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium mb-2" style={{ color: "#0E293B" }}>
+              <label htmlFor="phone" className="contact-label block text-sm font-medium">
                 Phone Number
               </label>
               <input
@@ -149,13 +136,13 @@ export default function ContactSection() {
                 value={formData.phone}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 rounded-lg border border-[#D8DEE0] focus:outline-none focus:border-[#3F7A89] transition-colors"
+                className="contact-input"
                 placeholder="+234 901 234 5678"
               />
             </div>
 
             <div>
-              <label htmlFor="message" className="block text-sm font-medium mb-2" style={{ color: "#0E293B" }}>
+              <label htmlFor="message" className="contact-label block text-sm font-medium">
                 Message
               </label>
               <textarea
@@ -165,14 +152,14 @@ export default function ContactSection() {
                 onChange={handleChange}
                 required
                 rows={5}
-                className="w-full px-4 py-3 rounded-lg border border-[#D8DEE0] focus:outline-none focus:border-[#3F7A89] transition-colors resize-none"
+                className="contact-textarea"
                 placeholder="Tell us about your project..."
               />
             </div>
 
-            <button type="submit" className="btn-primary w-full inline-flex items-center justify-center gap-2">
+            <button type="submit" className="btn-primary inline-flex w-full items-center justify-center gap-2">
               Send Message
-              <Send className="w-5 h-5" />
+              <Send className="h-5 w-5" />
             </button>
           </form>
         </div>

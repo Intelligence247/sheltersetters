@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Poppins, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import ThemeToggle from "@/components/theme-toggle"
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
 const poppins = Poppins({
@@ -134,6 +135,7 @@ export default function RootLayout({
       <body style={{ fontFamily: "Inter, system-ui, sans-serif" }}>
         {children}
         <ThemeToggle />
+        <Toaster richColors position="top-right" />
         <Analytics />
       </body>
     </html>

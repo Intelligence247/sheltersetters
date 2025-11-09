@@ -25,9 +25,12 @@ const sendEmail = async ({ to, subject, html, text }) => {
     return
   }
 
+  const fromAddress = config.email.from || config.email.user || "no-reply@sheltersetters.com"
+  const fromName = config.email.fromName || "Shelter Setters"
+
   try {
     await transporter.sendMail({
-      from: `"${config.email.fromName}" <${config.email.from}>`,
+      from: `"${fromName}" <${fromAddress}>`,
       to,
       subject,
       text,

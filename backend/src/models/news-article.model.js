@@ -32,6 +32,14 @@ const newsArticleSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+    },
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+    },
     tags: [
       {
         type: String,

@@ -38,32 +38,30 @@ const projects = [
 
 export default function FeaturedProjects() {
   return (
-    <section className="section-py bg-[#FBFCFD]" id="projects">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-        <div className="text-center mb-16">
+    <section className="section-py projects-section" id="projects">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
+        <div className="mb-16 text-center">
           <h2 className="heading-lg mb-4">Featured Projects</h2>
-          <p className="body-lg max-w-2xl mx-auto">
+          <p className="body-lg mx-auto max-w-2xl projects-subtitle">
             Showcasing excellence across residential, commercial, and industrial sectors
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {projects.map((project, index) => (
-            <div key={index} className="card group overflow-hidden hover:shadow-xl">
-              <div className="relative h-48 bg-[#E9EEF0] rounded-lg overflow-hidden mb-4">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {projects.map((project) => (
+            <div key={project.title} className="card projects-card group overflow-hidden">
+              <div className="projects-image relative mb-4 h-48 overflow-hidden rounded-lg">
                 <img
-                  src={`${project.image}`}
+                  src={project.image}
                   alt={project.alt}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />
               </div>
-              <h3 className="text-lg font-bold mb-2" style={{ color: "#0E293B" }}>
-                {project.title}
-              </h3>
-              <p className="text-sm mb-3" style={{ color: "#3F7A89" }}>
+              <h3 className="projects-title mb-2 text-lg font-bold">{project.title}</h3>
+              <p className="projects-meta mb-3 text-sm">
                 {project.location} • {project.year}
               </p>
-              <p className="body-sm">{project.description}</p>
+              <p className="projects-text body-sm">{project.description}</p>
             </div>
           ))}
         </div>

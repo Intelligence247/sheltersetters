@@ -32,6 +32,16 @@ const adminSchema = new mongoose.Schema(
     lastLoginAt: {
       type: Date,
     },
+    refreshTokenVersion: {
+      type: Number,
+      default: 0,
+    },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
@@ -50,6 +60,12 @@ adminSchema.pre("save", async function hashPassword(next) {
 
 adminSchema.methods.comparePassword = async function comparePassword(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password)
+}
+
+adminSchema.methods.incrementRefreshTokenVersion = async function incrementRefreshTokenVersion() {
+  this.refreshTokenVersion += 1
+  await this.save()
+  return this.refreshTokenVersion
 }
 
 module.exports = mongoose.model("Admin", adminSchema)

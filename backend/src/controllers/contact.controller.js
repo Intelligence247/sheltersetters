@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes")
 const ApiResponse = require("../utils/api-response")
 const asyncHandler = require("../utils/async-handler")
-const { submitMessage, listMessages, updateMessageStatus } = require("../services/contact.service")
+const { submitMessage, listMessages, updateMessageStatus, replyToMessage } = require("../services/contact.service")
 
 const submitContactForm = asyncHandler(async (req, res) => {
   const message = await submitMessage(req.body)
@@ -25,9 +25,15 @@ const changeMessageStatus = asyncHandler(async (req, res) => {
   return res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { message }, "Message updated"))
 })
 
+const replyToContactMessage = asyncHandler(async (req, res) => {
+  const message = await replyToMessage(req.params.id, req.user._id, req.body)
+  return res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, { message }, "Reply sent"))
+})
+
 module.exports = {
   submitContactForm,
   getMessages,
   changeMessageStatus,
+  replyToContactMessage,
 }
 
