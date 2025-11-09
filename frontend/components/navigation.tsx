@@ -9,20 +9,14 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <nav
-      className="fixed top-0 w-full z-50 border-b shadow-sm transition-colors duration-300"
-      style={{
-        backgroundColor: "var(--neutral-white)",
-        borderColor: "var(--color-metal-300)",
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+    <nav className="navigation-bar fixed top-0 z-50 w-full border-b shadow-sm transition-colors duration-300">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
             <div className="flex items-center gap-3 transition-colors">
-              <div className="flex h-12 w-12 items-center justify-center">
-                <Image src={"/logo3.png"} alt="Shelter Setters logo" height={46} width={46} />
+              <div className="flex h-16 w-16 items-center justify-center">
+                <Image src={"/official-logo2.png"} alt="Shelter Setters logo" height={64} width={64} className="object-contain object-center scale-[1.25]" />
               </div>
               <div className="lg:flex hidden flex-col leading-tight">
                 <span className="nav-brand-primary text-xs font-semibold uppercase tracking-[0.35em]">
@@ -36,32 +30,28 @@ export default function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden items-center gap-8 md:flex">
             <Link
               href="#services"
-              className="text-sm font-medium transition-colors hover:text-[#BD5A00]"
-              style={{ color: "var(--text-secondary)" }}
+              className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
             >
               Services
             </Link>
             <Link
               href="#projects"
-              className="text-sm font-medium transition-colors hover:text-[#BD5A00]"
-              style={{ color: "var(--text-secondary)" }}
+              className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
             >
               Projects
             </Link>
             <Link
               href="#about"
-              className="text-sm font-medium transition-colors hover:text-[#BD5A00]"
-              style={{ color: "var(--text-secondary)" }}
+              className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
             >
               About
             </Link>
             <Link
               href="#contact"
-              className="text-sm font-medium transition-colors hover:text-[#BD5A00]"
-              style={{ color: "var(--text-secondary)" }}
+              className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
             >
               Contact
             </Link>
@@ -75,46 +65,43 @@ export default function Navigation() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden p-2" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
+          <button
+            className="md:hidden p-2 text-[#0E293B] transition-colors dark:text-[#F7C08A]"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
+          >
             {isOpen ? (
-              <X className="w-6 h-6" style={{ color: "var(--color-primary-900)" }} />
+              <X className="h-6 w-6" />
             ) : (
-              <Menu className="w-6 h-6" style={{ color: "var(--color-primary-900)" }} />
+              <Menu className="h-6 w-6" />
             )}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div
-            className="md:hidden pb-4 space-y-3 border-t transition-colors"
-            style={{ borderColor: "var(--color-metal-300)" }}
-          >
+          <div className="mobile-menu space-y-3 border-t pb-4 transition-colors md:hidden">
             <Link
               href="#services"
-              className="block py-2 px-4 rounded-lg transition-colors hover:bg-[#E9EEF0]"
-              style={{ color: "var(--text-secondary)" }}
+              className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
             >
               Services
             </Link>
             <Link
               href="#projects"
-              className="block py-2 px-4 rounded-lg transition-colors hover:bg-[#E9EEF0]"
-              style={{ color: "var(--text-secondary)" }}
+              className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
             >
               Projects
             </Link>
             <Link
               href="#about"
-              className="block py-2 px-4 rounded-lg transition-colors hover:bg-[#E9EEF0]"
-              style={{ color: "var(--text-secondary)" }}
+              className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
             >
               About
             </Link>
             <Link
               href="#contact"
-              className="block py-2 px-4 rounded-lg transition-colors hover:bg-[#E9EEF0]"
-              style={{ color: "var(--text-secondary)" }}
+              className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
             >
               Contact
             </Link>

@@ -691,6 +691,50 @@ html[data-theme='dark'] .contact-textarea:focus {
   border-color: #6bd1ff;
 }
 
+.navigation-bar {
+  background-color: var(--neutral-white, #fbfcfd);
+  border-color: var(--color-metal-300, #d8dee0);
+}
+
+html[data-theme='dark'] .navigation-bar {
+  background-color: rgba(6, 16, 25, 0.94);
+  border-color: rgba(74, 94, 112, 0.5);
+}
+
+.navigation-link {
+  color: var(--text-secondary, #3f4a56);
+  transition: color 0.3s ease;
+}
+
+html[data-theme='dark'] .navigation-link {
+  color: #d5e0e8;
+}
+
+.mobile-menu {
+  border-color: var(--color-metal-300, #d8dee0);
+}
+
+html[data-theme='dark'] .mobile-menu {
+  border-color: rgba(74, 94, 112, 0.5);
+}
+
+.mobile-nav-link {
+  color: var(--text-secondary, #3f4a56);
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.mobile-nav-link:hover {
+  background-color: rgba(233, 238, 240, 0.8);
+}
+
+html[data-theme='dark'] .mobile-nav-link {
+  color: #d5e0e8;
+}
+
+html[data-theme='dark'] .mobile-nav-link:hover {
+  background-color: rgba(23, 38, 50, 0.7);
+}
+
 .nav-brand-primary {
   color: #0e293b;
   transition: color 0.3s ease;

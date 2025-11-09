@@ -16,8 +16,8 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg">
-                <Image src={"/logo3.png"} alt="logo" height={45} width={45}/>
+                className="w-16 h-16 rounded-lg flex items-center justify-center font-bold text-lg">
+                <Image src={"/official-logo2.png"} alt="logo" height={64} width={64} className="object-contain object-center" />
               </div>
               <span className="font-bold text-lg">Shelter Setters</span>
             </div>
