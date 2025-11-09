@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://sheltersetters.com",
   },
-  generator: "v0.app",
+  generator: "Intelysh",
 }
 
 export const viewport = {
