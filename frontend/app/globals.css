@@ -795,11 +795,18 @@ html[data-theme="dark"] .heading-xl {
 html[data-theme="dark"] .heading-lg {
   color: #fbfcfd;
 }
+.news-header {
+  color: var(--color-primary-900);
+}
+
+html[data-theme="dark"] .news-header {
+  color: #fbfcfd;
+}
 .community-heading {
   color: #fbfcfd;
 }
 
-html[data-theme="dark"] .heading-lg {
+html[data-theme="dark"] .community-heading {
   color: #fbfcfd;
 }
 
