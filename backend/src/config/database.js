@@ -5,13 +5,24 @@ const { log, error: logError } = require("../utils/logger")
 
 let memoryServer
 let MongoMemoryServerModule
+const globalState = global
+
+if (!globalState.__sheltersettersMongo) {
+  globalState.__sheltersettersMongo = {
+    connection: null,
+    promise: null,
+  }
+}
+
+const cached = globalState.__sheltersettersMongo
 
 const connectWithUri = async (uri) => {
-  await mongoose.connect(uri, {
+  const connection = await mongoose.connect(uri, {
     autoIndex: config.env !== "production",
+    bufferCommands: false,
   })
   log(`Connected to MongoDB${memoryServer ? " (in-memory)" : ""}`)
-  return mongoose.connection
+  return connection
 }
 
 const ensureMemoryServerModule = () => {
@@ -37,22 +48,43 @@ const startInMemoryServer = async () => {
 }
 
 const connectDatabase = async () => {
+  if (cached.connection && mongoose.connection.readyState === 1) {
+    return cached.connection
+  }
+
+  if (cached.promise) {
+    return cached.promise
+  }
+
   if (config.mongoUri) {
-    try {
-      return await connectWithUri(config.mongoUri)
-    } catch (err) {
-      logError("Failed to connect to MongoDB:", err.message)
-      if (!config.useInMemoryDb) {
-        throw err
-      }
-      log("Falling back to in-memory MongoDB instance")
-    }
+    cached.promise = connectWithUri(config.mongoUri)
+      .then((connection) => {
+        cached.connection = connection
+        return connection
+      })
+      .catch((err) => {
+        cached.promise = null
+        logError("Failed to connect to MongoDB:", err.message)
+        if (!config.useInMemoryDb) {
+          throw err
+        }
+        log("Falling back to in-memory MongoDB instance")
+        return startInMemoryServer().then((connection) => {
+          cached.connection = connection
+          return connection
+        })
+      })
+    return cached.promise
   } else if (!config.useInMemoryDb) {
     throw new Error("MONGODB_URI is not defined and USE_IN_MEMORY_DB is disabled")
   }
 
   if (config.useInMemoryDb) {
-    return startInMemoryServer()
+    cached.promise = startInMemoryServer().then((connection) => {
+      cached.connection = connection
+      return connection
+    })
+    return cached.promise
   }
 
   throw new Error("Unable to establish a MongoDB connection")
@@ -65,6 +97,8 @@ const disconnectDatabase = async () => {
     memoryServer = null
     log("In-memory MongoDB instance stopped")
   }
+  cached.connection = null
+  cached.promise = null
 }
 
 module.exports = {

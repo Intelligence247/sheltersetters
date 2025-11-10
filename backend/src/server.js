@@ -37,18 +37,23 @@ const shutdown = async (signal, exitCode = 0) => {
   }
 }
 
-startServer()
+if (!process.env.VERCEL) {
+  startServer()
 
-process.on("unhandledRejection", (reason) => {
-  logError("Unhandled Rejection:", reason)
-  shutdown("unhandledRejection", 1)
-})
+  process.on("unhandledRejection", (reason) => {
+    logError("Unhandled Rejection:", reason)
+    shutdown("unhandledRejection", 1)
+  })
 
-process.on("SIGINT", () => {
-  shutdown("SIGINT")
-})
+  process.on("SIGINT", () => {
+    shutdown("SIGINT")
+  })
 
-process.on("SIGTERM", () => {
-  shutdown("SIGTERM")
-})
+  process.on("SIGTERM", () => {
+    shutdown("SIGTERM")
+  })
+}
 
+module.exports = {
+  startServer,
+}
