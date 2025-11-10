@@ -35,7 +35,7 @@ router.post(
 router.get(
   "/",
   authenticate,
-  authorize("admin", "editor"),
+  authorize("super_admin", "customer_care"),
   [
     query("status").optional().isIn(["new", "in_progress", "closed"]).withMessage("Invalid status value"),
     query("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
@@ -48,7 +48,7 @@ router.get(
 router.patch(
   "/:id",
   authenticate,
-  authorize("admin", "editor"),
+  authorize("super_admin", "customer_care"),
   [
     param("id").isMongoId().withMessage("Valid message id is required"),
     body("status").optional().isIn(["new", "in_progress", "closed"]).withMessage("Invalid status"),
@@ -61,7 +61,7 @@ router.patch(
 router.post(
   "/:id/reply",
   authenticate,
-  authorize("admin", "editor"),
+  authorize("super_admin", "customer_care"),
   [
     param("id").isMongoId().withMessage("Valid message id is required"),
     body("reply").isLength({ min: 5 }).withMessage("Reply must be at least 5 characters"),

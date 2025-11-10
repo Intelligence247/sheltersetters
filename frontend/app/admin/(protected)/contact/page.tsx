@@ -3,7 +3,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Filter, Mail, RefreshCcw } from 'lucide-react'
 
-import type { ContactMessage, ContactStatus, ContactListResponse } from '@/types/contact'
+import type { ContactMessage, ContactStatus, ContactListResult } from '@/types/contact'
+import type { ApiResponse } from '@/types/api'
 import { useAuth } from '@/components/admin/auth-context'
 import { ContactTable } from '@/components/admin/contact/contact-table'
 import { ContactDetail } from '@/components/admin/contact/contact-detail'
@@ -11,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { RoleGate } from '@/components/admin/role-gate'
 
 const statusFilters: { label: string; value: ContactStatus | 'all' }[] = [
   { label: 'All', value: 'all' },
@@ -36,7 +38,7 @@ export default function AdminContactDesk() {
         searchParams.set('status', statusFilter)
       }
       searchParams.set('limit', '20')
-      const response = await request<ContactListResponse>(`/api/contact?${searchParams.toString()}`, {
+      const response = await request<ApiResponse<ContactListResult>>(`/api/contact?${searchParams.toString()}`, {
         signal,
       })
       const items = response.data.messages
@@ -51,10 +53,8 @@ export default function AdminContactDesk() {
       })
     } catch (error: any) {
       if (error?.name === 'AbortError') return
-      toast({
-        title: 'Unable to load messages',
+      toast.error('Unable to load messages', {
         description: error?.body?.message || 'Please try again shortly.',
-        variant: 'destructive',
       })
     } finally {
       setLoading(false)
@@ -70,23 +70,21 @@ export default function AdminContactDesk() {
   const handleStatusChange = async (messageId: string, status: ContactStatus) => {
     setUpdating(true)
     try {
-      await request(`/api/contact/${messageId}`, {
+      const response = await request<ApiResponse<{ message: ContactMessage }>>(`/api/contact/${messageId}`, {
         method: 'PATCH',
         body: JSON.stringify({ status }),
       })
+      const updated = response.data.message
       setMessages((prev) =>
-        prev.map((message) => (message._id === messageId ? { ...message, status, respondedAt: status === 'closed' ? new Date().toISOString() : message.respondedAt } : message))
+        prev.map((message) => (message._id === messageId ? updated : message))
       )
-      setSelected((prev) => (prev && prev._id === messageId ? { ...prev, status } : prev))
-      toast({
-        title: 'Status updated',
+      setSelected((prev) => (prev && prev._id === messageId ? updated : prev))
+      toast.success('Status updated', {
         description: 'The enquiry status has been updated successfully.',
       })
     } catch (error: any) {
-      toast({
-        title: 'Status update failed',
+      toast.error('Status update failed', {
         description: error?.body?.message || 'Please try again.',
-        variant: 'destructive',
       })
     } finally {
       setUpdating(false)
@@ -96,38 +94,23 @@ export default function AdminContactDesk() {
   const handleReply = async (messageId: string, payload: { reply: string; status: ContactStatus }) => {
     setSendingReply(true)
     try {
-      await request(`/api/contact/${messageId}/reply`, {
+      const response = await request<ApiResponse<{ message: ContactMessage }>>(`/api/contact/${messageId}/reply`, {
         method: 'POST',
         body: JSON.stringify(payload),
       })
-      const repliedAt = new Date().toISOString()
+      const updated = response.data.message
       setMessages((prev) =>
-        prev.map((message) =>
-          message._id === messageId
-            ? {
-                ...message,
-                reply: payload.reply,
-                status: payload.status,
-                respondedAt: repliedAt,
-                repliedAt,
-              }
-            : message
-        )
+        prev.map((message) => (message._id === messageId ? updated : message))
       )
       setSelected((prev) =>
-        prev && prev._id === messageId
-          ? { ...prev, reply: payload.reply, status: payload.status, respondedAt: repliedAt, repliedAt }
-          : prev
+        prev && prev._id === messageId ? updated : prev
       )
-      toast({
-        title: 'Reply sent',
+      toast.success('Reply sent', {
         description: 'The client has been notified via email.',
       })
     } catch (error: any) {
-      toast({
-        title: 'Reply failed',
+      toast.error('Reply failed', {
         description: error?.body?.message || 'Unable to send email response at this time.',
-        variant: 'destructive',
       })
     } finally {
       setSendingReply(false)
@@ -146,7 +129,8 @@ export default function AdminContactDesk() {
   }, [messages])
 
   return (
-    <div className="space-y-6">
+    <RoleGate allowed={['super_admin', 'customer_care']}>
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-10 md:px-6 lg:px-8">
       <Card className="border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
@@ -183,7 +167,7 @@ export default function AdminContactDesk() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 text-xs uppercase tracking-[0.25em] text-[#0E293B] dark:text-slate-200 md:grid-cols-4">
+          <div className="grid gap-3 text-xs uppercase tracking-[0.25em] text-[#0E293B] dark:text-slate-200 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 dark:border-slate-800 dark:bg-slate-900/40">
               <p>Total enquiries</p>
               <p className="mt-2 text-2xl font-semibold">{summaryCounts.total}</p>
@@ -204,7 +188,7 @@ export default function AdminContactDesk() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <ContactTable
           messages={messages}
           onSelect={setSelected}
@@ -218,7 +202,8 @@ export default function AdminContactDesk() {
           sending={sendingReply || updating}
         />
       </div>
-    </div>
+      </div>
+    </RoleGate>
   )
 }
 

@@ -1,12 +1,13 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useAuth } from '@/components/admin/auth-context'
 import type { ApiResponse } from '@/types/api'
 import type { Project } from '@/types/content'
+import { uploadAdminImage } from '@/lib/uploads'
 import {
   Dialog,
   DialogContent,
@@ -91,6 +92,7 @@ export const ProjectManager = () => {
   const [editing, setEditing] = useState<Project | null>(null)
   const [form, setForm] = useState<ProjectFormState>(initialForm)
   const [submitting, setSubmitting] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   const fetchProjects = useCallback(async () => {
     setLoading(true)
@@ -231,6 +233,26 @@ export const ProjectManager = () => {
     }
   }
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setUploadingImage(true)
+    try {
+      const result = await uploadAdminImage(request, file, { folder: 'projects' })
+      setForm((prev) => ({ ...prev, imageUrl: result.url }))
+      toast.success('Hero image uploaded', {
+        description: 'The project image is ready to publish.',
+      })
+    } catch (error: any) {
+      toast.error('Image upload failed', {
+        description: error?.body?.message || 'Please try another file.',
+      })
+    } finally {
+      setUploadingImage(false)
+      event.target.value = ''
+    }
+  }
+
   const orderedProjects = useMemo(
     () => [...projects].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
     [projects]
@@ -300,8 +322,29 @@ export const ProjectManager = () => {
                     <Input id="location" name="location" value={form.location} onChange={handleChange} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="imageUrl">Hero image URL</Label>
-                    <Input id="imageUrl" name="imageUrl" value={form.imageUrl} onChange={handleChange} />
+                    <Label htmlFor="imageUrl">Hero image</Label>
+                    {form.imageUrl && (
+                      <div className="overflow-hidden rounded-lg border border-slate-200">
+                        <img src={form.imageUrl} alt={form.title} className="h-40 w-full object-cover" />
+                      </div>
+                    )}
+                    <Input
+                      id="imageUrl"
+                      name="imageUrl"
+                      value={form.imageUrl}
+                      onChange={handleChange}
+                      placeholder="https://"
+                    />
+                    <div className="flex items-center gap-3">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                      />
+                      {uploadingImage && <Loader2 className="h-4 w-4 animate-spin text-[#BD5A00]" />}
+                    </div>
+                    <p className="text-xs text-slate-500">Upload a new visual or paste an existing Cloudinary URL.</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="completedAt">Completion date</Label>

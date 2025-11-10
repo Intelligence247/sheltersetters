@@ -16,17 +16,15 @@ export interface ContactMessage {
   updatedAt: string
 }
 
-export interface ContactListResponse {
-  status: string
-  message: string
-  data: {
-    messages: ContactMessage[]
-    pagination: {
-      total: number
-      page: number
-      limit: number
-      pages: number
-    }
-  }
+export interface ContactPagination {
+  total: number
+  page: number
+  limit: number
+  pages: number
+}
+
+export interface ContactListResult {
+  messages: ContactMessage[]
+  pagination: ContactPagination
 }
 

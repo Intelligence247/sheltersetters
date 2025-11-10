@@ -29,8 +29,15 @@ const buildAuthResponse = (admin) => {
   }
 }
 
-const registerAdmin = async ({ name, email, password, role = "admin", registrationSecret }) => {
-  if (config.admin.registrationSecret && registrationSecret !== config.admin.registrationSecret) {
+const registerAdmin = async ({ name, email, password, registrationSecret }) => {
+  if (!config.admin.registrationSecret) {
+    throw new ApiError(
+      StatusCodes.FORBIDDEN,
+      "Admin self-registration is disabled. Contact a system administrator."
+    )
+  }
+
+  if (registrationSecret !== config.admin.registrationSecret) {
     throw new ApiError(StatusCodes.FORBIDDEN, "Invalid registration secret")
   }
 
@@ -39,7 +46,7 @@ const registerAdmin = async ({ name, email, password, role = "admin", registrati
     throw new ApiError(StatusCodes.CONFLICT, "An admin with that email already exists")
   }
 
-  const admin = await Admin.create({ name, email, password, role })
+  const admin = await Admin.create({ name, email, password, role: "super_admin" })
   return buildAuthResponse(admin)
 }
 

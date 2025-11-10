@@ -1,12 +1,13 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useAuth } from '@/components/admin/auth-context'
 import type { ApiResponse } from '@/types/api'
 import type { TeamMember } from '@/types/content'
+import { uploadAdminImage } from '@/lib/uploads'
 import {
   Dialog,
   DialogContent,
@@ -60,6 +61,7 @@ export const TeamManager = () => {
   const [editing, setEditing] = useState<TeamMember | null>(null)
   const [form, setForm] = useState<TeamFormState>(initialForm)
   const [submitting, setSubmitting] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   const fetchMembers = useCallback(async () => {
     setLoading(true)
@@ -83,6 +85,26 @@ export const TeamManager = () => {
     setEditing(null)
     setForm(initialForm)
     setDialogOpen(true)
+  }
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setUploadingImage(true)
+    try {
+      const result = await uploadAdminImage(request, file, { folder: 'team' })
+      setForm((prev) => ({ ...prev, imageUrl: result.url }))
+      toast.success('Profile image uploaded', {
+        description: 'The image is ready to appear on the leadership page.',
+      })
+    } catch (error: any) {
+      toast.error('Image upload failed', {
+        description: error?.body?.message || 'Please try another file.',
+      })
+    } finally {
+      setUploadingImage(false)
+      event.target.value = ''
+    }
   }
 
   const openEdit = (member: TeamMember) => {
@@ -238,8 +260,29 @@ export const TeamManager = () => {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="imageUrl">Profile image URL</Label>
-                    <Input id="imageUrl" name="imageUrl" value={form.imageUrl} onChange={handleChange} />
+                  <Label htmlFor="imageUrl">Profile image</Label>
+                  {form.imageUrl && (
+                    <div className="overflow-hidden rounded-lg border border-slate-200">
+                      <img src={form.imageUrl} alt={form.name} className="h-36 w-full object-cover" />
+                    </div>
+                  )}
+                  <Input
+                    id="imageUrl"
+                    name="imageUrl"
+                    value={form.imageUrl}
+                    onChange={handleChange}
+                    placeholder="https://"
+                  />
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploadingImage}
+                    />
+                    {uploadingImage && <Loader2 className="h-4 w-4 animate-spin text-[#BD5A00]" />}
+                  </div>
+                  <p className="text-xs text-slate-500">Upload a headshot or paste an existing media URL.</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="order">Display order</Label>

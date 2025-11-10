@@ -14,7 +14,7 @@ export default function CSRSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <div>
-            <h2 className="heading-lg mb-6 text-white">Community Impact & Social Responsibility</h2>
+            <h2 className="community-heading heading-lg mb-6 text-white">Community Impact & Social Responsibility</h2>
             <p className="body-lg text-white/90 mb-8">
               At Shelter Setters, we believe in giving back to the communities we serve. We are committed to sustainable
               development through impactful CSR initiatives.

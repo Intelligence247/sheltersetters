@@ -9,10 +9,12 @@ import { ServiceManager } from '@/components/admin/content/service-manager'
 import { NewsManager } from '@/components/admin/content/news-manager'
 import { ProjectManager } from '@/components/admin/content/project-manager'
 import { TeamManager } from '@/components/admin/content/team-manager'
+import { RoleGate } from '@/components/admin/role-gate'
 
 export default function AdminContentDashboard() {
   return (
-    <div className="space-y-6">
+    <RoleGate allowed={['super_admin', 'content_manager']}>
+      <div className="space-y-6">
       <Card className="border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
@@ -64,7 +66,8 @@ export default function AdminContentDashboard() {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </RoleGate>
   )
 }
 

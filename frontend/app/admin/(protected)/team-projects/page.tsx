@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { RoleGate } from '@/components/admin/role-gate'
 
 const getInitials = (name: string) =>
   name
@@ -137,7 +138,8 @@ export default function AdminTeamProjectsDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <RoleGate allowed={['super_admin', 'content_manager']}>
+      <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
           <CardHeader className="flex flex-row items-center justify-between">
@@ -345,7 +347,8 @@ export default function AdminTeamProjectsDashboard() {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </RoleGate>
   )
 }
 

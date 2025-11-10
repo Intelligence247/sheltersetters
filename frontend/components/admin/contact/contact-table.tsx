@@ -40,7 +40,7 @@ export const ContactTable = ({ messages, onSelect, selectedId, loading }: Contac
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-      <div className="overflow-hidden">
+      <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
           <thead className="bg-slate-50/60 text-left uppercase tracking-[0.25em] text-slate-400 dark:bg-slate-900/40 dark:text-slate-500">
             <tr>

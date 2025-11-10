@@ -56,6 +56,16 @@ const config = {
   publicUrls: {
     backend: process.env.BACKEND_PUBLIC_URL || "http://localhost:5000",
   },
+  uploads: {
+    maxFileSizeMb: parseNumber(process.env.UPLOAD_MAX_FILE_SIZE_MB, 5),
+    allowedFormats: commaSeparatedToArray(process.env.UPLOAD_ALLOWED_FORMATS) || ["jpg", "jpeg", "png", "webp"],
+    cloudinary: {
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.CLOUDINARY_API_KEY,
+      apiSecret: process.env.CLOUDINARY_API_SECRET,
+      folder: process.env.CLOUDINARY_BASE_FOLDER || "sheltersetters",
+    },
+  },
   admin: {
     registrationSecret: process.env.ADMIN_REGISTRATION_SECRET,
   },

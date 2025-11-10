@@ -38,16 +38,16 @@ export default function Navigation() {
               Services
             </Link>
             <Link
-              href="#projects"
-              className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
-            >
-              Projects
-            </Link>
-            <Link
               href="#about"
               className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
             >
               About
+            </Link>
+            <Link
+              href="#projects"
+              className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
+            >
+              Projects
             </Link>
             <Link
               href="#contact"

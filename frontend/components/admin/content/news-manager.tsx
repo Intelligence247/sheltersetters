@@ -1,12 +1,13 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { CalendarHeart, Pencil, Plus, Trash2 } from 'lucide-react'
+import { CalendarHeart, Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useAuth } from '@/components/admin/auth-context'
 import type { ApiResponse } from '@/types/api'
 import type { NewsArticle } from '@/types/content'
+import { uploadAdminImage } from '@/lib/uploads'
 import {
   Dialog,
   DialogContent,
@@ -76,6 +77,7 @@ export const NewsManager = () => {
   const [editing, setEditing] = useState<NewsArticle | null>(null)
   const [form, setForm] = useState<NewsFormState>(initialForm)
   const [submitting, setSubmitting] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   const fetchNews = useCallback(async () => {
     setLoading(true)
@@ -99,6 +101,26 @@ export const NewsManager = () => {
     setEditing(null)
     setForm(initialForm)
     setDialogOpen(true)
+  }
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setUploadingImage(true)
+    try {
+      const result = await uploadAdminImage(request, file, { folder: 'news' })
+      setForm((prev) => ({ ...prev, imageUrl: result.url }))
+      toast.success('Image uploaded', {
+        description: 'The hero image is ready to use.',
+      })
+    } catch (error: any) {
+      toast.error('Image upload failed', {
+        description: error?.body?.message || 'Please try again shortly.',
+      })
+    } finally {
+      setUploadingImage(false)
+      event.target.value = ''
+    }
   }
 
   const openEdit = (article: NewsArticle) => {
@@ -248,8 +270,31 @@ export const NewsManager = () => {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="imageUrl">Image URL</Label>
-                    <Input id="imageUrl" name="imageUrl" value={form.imageUrl} onChange={handleChange} />
+                    <Label htmlFor="imageUrl">Feature image</Label>
+                    {form.imageUrl && (
+                      <div className="overflow-hidden rounded-lg border border-slate-200">
+                        <img src={form.imageUrl} alt={form.altText || form.headline} className="h-36 w-full object-cover" />
+                      </div>
+                    )}
+                    <Input
+                      id="imageUrl"
+                      name="imageUrl"
+                      value={form.imageUrl}
+                      onChange={handleChange}
+                      placeholder="https://"
+                    />
+                    <div className="flex items-center gap-3">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                      />
+                      {uploadingImage && <Loader2 className="h-4 w-4 animate-spin text-[#BD5A00]" />}
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Upload a new image or paste an existing URL from your media library.
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="altText">Image alt text</Label>

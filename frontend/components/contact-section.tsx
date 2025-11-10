@@ -2,14 +2,20 @@
 
 import React, { useState } from "react"
 import { Mail, Phone, MapPin, Send } from "lucide-react"
+import { toast } from "sonner"
+
+import { API_BASE_URL } from "@/lib/config"
+
+const initialFormState = {
+  name: "",
+  email: "",
+  phone: "",
+  message: "",
+}
 
 export default function ContactSection() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  })
+  const [formData, setFormData] = useState(initialFormState)
+  const [submitting, setSubmitting] = useState(false)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target
@@ -19,9 +25,42 @@ export default function ContactSection() {
     }))
   }
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    console.log(formData)
+    if (submitting) return
+
+    setSubmitting(true)
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          message: formData.message.trim(),
+        }),
+      })
+
+      const payload = await response.json()
+
+      if (!response.ok) {
+        throw new Error(payload?.message || "Unable to send message")
+      }
+
+      toast.success("Message sent", {
+        description: payload?.message || "Thank you for reaching out. We'll respond shortly.",
+      })
+      setFormData(initialFormState)
+    } catch (error: any) {
+      toast.error("Message not sent", {
+        description: error?.message || "Please try again or use the phone numbers listed.",
+      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -157,8 +196,12 @@ export default function ContactSection() {
               />
             </div>
 
-            <button type="submit" className="btn-primary inline-flex w-full items-center justify-center gap-2">
-              Send Message
+            <button
+              type="submit"
+              className="btn-primary inline-flex w-full items-center justify-center gap-2 disabled:opacity-70"
+              disabled={submitting}
+            >
+              {submitting ? "Sending…" : "Send Message"}
               <Send className="h-5 w-5" />
             </button>
           </form>

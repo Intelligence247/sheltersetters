@@ -795,6 +795,13 @@ html[data-theme="dark"] .heading-xl {
 html[data-theme="dark"] .heading-lg {
   color: #fbfcfd;
 }
+.community-heading {
+  color: #fbfcfd;
+}
+
+html[data-theme="dark"] .heading-lg {
+  color: #fbfcfd;
+}
 
 @media (min-width: 768px) {
   .heading-lg {
@@ -818,7 +825,7 @@ html[data-theme="dark"] .heading-md {
 .body-lg {
   font-size: 1.125rem;
   line-height: 1.75rem;
-  color: #2c3e50;
+  color: #8a9aa3;
   transition: color 0.3s ease;
 }
 

@@ -1,12 +1,13 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useAuth } from '@/components/admin/auth-context'
 import type { ApiResponse } from '@/types/api'
 import type { Service } from '@/types/content'
+import { uploadAdminImage } from '@/lib/uploads'
 import {
   Dialog,
   DialogContent,
@@ -71,6 +72,7 @@ export const ServiceManager = () => {
   const [editing, setEditing] = useState<Service | null>(null)
   const [form, setForm] = useState<ServiceFormState>(initialForm)
   const [submitting, setSubmitting] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   const fetchServices = useCallback(async () => {
     setLoading(true)
@@ -94,6 +96,26 @@ export const ServiceManager = () => {
     setEditing(null)
     setForm(initialForm)
     setDialogOpen(true)
+  }
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setUploadingImage(true)
+    try {
+      const result = await uploadAdminImage(request, file, { folder: 'services' })
+      setForm((prev) => ({ ...prev, imageUrl: result.url }))
+      toast.success('Image uploaded', {
+        description: 'The service image has been stored securely.',
+      })
+    } catch (error: any) {
+      toast.error('Image upload failed', {
+        description: error?.body?.message || 'Please try another image.',
+      })
+    } finally {
+      setUploadingImage(false)
+      event.target.value = ''
+    }
   }
 
   const openEdit = (service: Service) => {
@@ -257,8 +279,31 @@ export const ServiceManager = () => {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="imageUrl">Image URL</Label>
-                    <Input id="imageUrl" name="imageUrl" value={form.imageUrl} onChange={handleChange} />
+                    <Label htmlFor="imageUrl">Image</Label>
+                    {form.imageUrl && (
+                      <div className="overflow-hidden rounded-lg border border-slate-200">
+                        <img src={form.imageUrl} alt="Service visual" className="h-36 w-full object-cover" />
+                      </div>
+                    )}
+                    <Input
+                      id="imageUrl"
+                      name="imageUrl"
+                      value={form.imageUrl}
+                      onChange={handleChange}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                    <div className="flex items-center gap-3">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={uploadingImage}
+                      />
+                      {uploadingImage && <Loader2 className="h-4 w-4 animate-spin text-[#BD5A00]" />}
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Upload a new asset or paste an existing URL. Images are hosted via Cloudinary.
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="order">Display order</Label>

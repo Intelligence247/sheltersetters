@@ -1,7 +1,16 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { CalendarCheck, KeyRound, Lock, Mail, RefreshCcw, Settings, ShieldCheck, User2 } from 'lucide-react'
+import {
+  CalendarCheck,
+  KeyRound,
+  Lock,
+  Mail,
+  RefreshCcw,
+  Settings,
+  ShieldCheck,
+  User2,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useAuth } from '@/components/admin/auth-context'
@@ -12,6 +21,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import AdminManagementPanel from '@/components/admin/settings/admin-management'
 
 const fallbackOrigin = typeof window !== 'undefined' ? window.location.origin : ''
 
@@ -261,6 +271,8 @@ export default function AdminSettings() {
           </Button>
         </CardContent>
       </Card>
+
+      <AdminManagementPanel />
     </div>
   )
 }

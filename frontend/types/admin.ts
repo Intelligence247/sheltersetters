@@ -1,4 +1,4 @@
-export type AdminRole = 'admin' | 'editor' | 'viewer'
+export type AdminRole = 'super_admin' | 'content_manager' | 'customer_care'
 
 export interface AdminProfile {
   _id: string
@@ -8,6 +8,7 @@ export interface AdminProfile {
   isActive: boolean
   createdAt: string
   updatedAt: string
+  lastLoginAt?: string | null
 }
 
 export interface AuthTokens {

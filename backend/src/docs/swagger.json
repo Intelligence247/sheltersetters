@@ -25,7 +25,10 @@
     { "name": "Auth", "description": "Administrator authentication" },
     { "name": "Content", "description": "Public website content" },
     { "name": "Contact", "description": "Contact form submissions" },
-    { "name": "Admin Content", "description": "Admin management for services, news, projects, and team" }
+    { "name": "Admin Content", "description": "Admin management for services, news, projects, and team" },
+    { "name": "Admin Users", "description": "Super admin tools for managing administrator accounts" },
+    { "name": "Admin Dashboard", "description": "Aggregated insights for administrators" },
+    { "name": "Uploads", "description": "Media upload endpoints for the admin console" }
   ],
   "paths": {
     "/status": {
@@ -458,8 +461,153 @@
           "404": { "$ref": "#/components/responses/NotFoundError" }
         }
       }
-    }
-    ,
+    },
+    "/api/admin/dashboard/overview": {
+      "get": {
+        "tags": ["Admin Dashboard"],
+        "summary": "Dashboard overview metrics",
+        "description": "Returns aggregate counts and recent activity for the admin landing page.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Overview metrics returned",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DashboardOverviewResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+    "/api/uploads": {
+      "post": {
+        "tags": ["Uploads"],
+        "summary": "Upload an image to Cloudinary",
+        "description": "Accepts an image file and stores it on Cloudinary, returning the hosted URL. Only super admins and content managers are permitted.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image file to upload"
+                  },
+                  "folder": {
+                    "type": "string",
+                    "description": "Optional subfolder inside the configured Cloudinary base folder"
+                  }
+                },
+                "required": ["file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Image uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UploadResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "403": { "$ref": "#/components/responses/ForbiddenError" },
+          "500": { "$ref": "#/components/responses/ServerError" }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": ["Admin Users"],
+        "summary": "List administrator accounts",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of admins",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminListResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "403": { "$ref": "#/components/responses/ForbiddenError" }
+        }
+      },
+      "post": {
+        "tags": ["Admin Users"],
+        "summary": "Create administrator account",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminCreateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Administrator created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminItemResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "403": { "$ref": "#/components/responses/ForbiddenError" },
+          "409": { "$ref": "#/components/responses/ConflictError" }
+        }
+      }
+    },
+    "/api/admin/users/{id}": {
+      "patch": {
+        "tags": ["Admin Users"],
+        "summary": "Update administrator role or status",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^[a-fA-F0-9]{24}$" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminUpdateRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Administrator updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminItemResponse" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/ValidationError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" },
+          "403": { "$ref": "#/components/responses/ForbiddenError" },
+          "404": { "$ref": "#/components/responses/NotFoundError" }
+        }
+      }
+    },
     "/api/admin/content/services": {
       "get": {
         "tags": ["Admin Content"],
@@ -895,7 +1043,7 @@
           "_id": { "type": "string", "example": "65a01f65c3f4d8fce5fe9bd2" },
           "name": { "type": "string" },
           "email": { "type": "string", "format": "email" },
-          "role": { "type": "string", "enum": ["admin", "editor", "viewer"] },
+          "role": { "type": "string", "enum": ["super_admin", "content_manager", "customer_care"] },
           "isActive": { "type": "boolean" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
@@ -903,16 +1051,18 @@
       },
       "RegisterRequest": {
         "type": "object",
-        "required": ["name", "email", "password"],
+        "required": ["name", "email", "password", "registrationSecret"],
         "properties": {
           "name": { "type": "string" },
           "email": { "type": "string", "format": "email" },
           "password": { "type": "string", "format": "password", "minLength": 8 },
-          "role": { "type": "string", "enum": ["admin", "editor", "viewer"] },
-          "registrationSecret": { "type": "string" }
+          "registrationSecret": {
+            "type": "string",
+            "description": "Invitation secret shared internally by the technical administrator"
+          }
         }
       },
-      "AdminResponse": {
+      "AdminItemResponse": {
         "allOf": [
           { "$ref": "#/components/schemas/ApiResponse" },
           {
@@ -927,6 +1077,42 @@
             }
           }
         ]
+      },
+      "AdminListResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "admins": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Admin" }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AdminCreateRequest": {
+        "type": "object",
+        "required": ["name", "email", "password", "role"],
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "format": "password", "minLength": 8 },
+          "role": { "type": "string", "enum": ["super_admin", "content_manager", "customer_care"] }
+        }
+      },
+      "AdminUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "role": { "type": "string", "enum": ["super_admin", "content_manager", "customer_care"] },
+          "isActive": { "type": "boolean" }
+        }
       },
       "LoginRequest": {
         "type": "object",
@@ -1346,6 +1532,96 @@
           }
         ]
       },
+      "DashboardMessageSummary": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "status": { "type": "string", "enum": ["new", "in_progress", "closed"] },
+          "message": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "DashboardOverviewResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "metrics": {
+                    "type": "object",
+                    "properties": {
+                      "enquiries": {
+                        "type": "object",
+                        "properties": {
+                          "open": { "type": "integer" },
+                          "total": { "type": "integer" }
+                        }
+                      },
+                      "team": {
+                        "type": "object",
+                        "properties": {
+                          "active": { "type": "integer" },
+                          "total": { "type": "integer" }
+                        }
+                      },
+                      "projects": {
+                        "type": "object",
+                        "properties": {
+                          "live": { "type": "integer" },
+                          "total": { "type": "integer" }
+                        }
+                      },
+                      "services": {
+                        "type": "object",
+                        "properties": {
+                          "active": { "type": "integer" },
+                          "total": { "type": "integer" }
+                        }
+                      },
+                      "news": {
+                        "type": "object",
+                        "properties": {
+                          "published": { "type": "integer" }
+                        }
+                      }
+                    }
+                  },
+                  "recentMessages": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/DashboardMessageSummary" }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "UploadResponse": {
+        "allOf": [
+          { "$ref": "#/components/schemas/ApiResponse" },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object",
+                "properties": {
+                  "url": { "type": "string", "format": "uri" },
+                  "publicId": { "type": "string" },
+                  "width": { "type": "integer" },
+                  "height": { "type": "integer" },
+                  "format": { "type": "string" },
+                  "bytes": { "type": "integer" }
+                }
+              }
+            }
+          }
+        ]
+      },
       "ContactStatusRequest": {
         "type": "object",
         "properties": {
@@ -1445,6 +1721,14 @@
       },
       "ValidationError": {
         "description": "Validation failed",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "Unexpected server error",
         "content": {
           "application/json": {
             "schema": { "$ref": "#/components/schemas/ErrorResponse" }

@@ -9,19 +9,41 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { useAuth } from '@/components/admin/auth-context'
+import type { AdminRole } from '@/types/admin'
 
-const navItems = [
+interface NavItem {
+  label: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  roles?: AdminRole[]
+}
+
+const navItems: NavItem[] = [
   { label: 'Overview', href: '/admin', icon: LayoutDashboard },
-  { label: 'Contact Desk', href: '/admin/contact', icon: MessageSquare },
-  { label: 'Content', href: '/admin/content', icon: FileText },
-  { label: 'Team & Projects', href: '/admin/team-projects', icon: Users },
+  { label: 'Contact Desk', href: '/admin/contact', icon: MessageSquare, roles: ['super_admin', 'customer_care'] },
+  { label: 'Content', href: '/admin/content', icon: FileText, roles: ['super_admin', 'content_manager'] },
+  { label: 'Team & Projects', href: '/admin/team-projects', icon: Users, roles: ['super_admin', 'content_manager'] },
   { label: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 
+const ROLE_LABELS: Record<AdminRole, string> = {
+  super_admin: 'Super Admin',
+  content_manager: 'Content Manager',
+  customer_care: 'Customer Care',
+}
+
 const Sidebar = () => {
   const pathname = usePathname()
+  const { admin } = useAuth()
+  const role = admin?.role
+
+  const allowedItems = navItems.filter((item) => {
+    if (!item.roles || !role) return true
+    return item.roles.includes(role)
+  })
+
   return (
-    <aside className="hidden w-64 flex-shrink-0 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:flex">
+    <aside className="hidden flex-shrink-0 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:flex lg:h-full lg:w-64 lg:overflow-y-auto">
       <div className="flex h-16 items-center border-b border-slate-200 px-6 dark:border-slate-800">
         <div className="flex flex-col">
           <span className="text-xs uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">Shelter Setters</span>
@@ -29,7 +51,7 @@ const Sidebar = () => {
         </div>
       </div>
       <nav className="flex-1 space-y-1 px-4 py-6">
-        {navItems.map(({ label, href, icon: Icon }) => {
+        {allowedItems.map(({ label, href, icon: Icon }) => {
           const active = pathname === href
           return (
             <Link
@@ -54,6 +76,14 @@ const Sidebar = () => {
 
 const MobileNav = () => {
   const pathname = usePathname()
+  const { admin } = useAuth()
+  const role = admin?.role
+
+  const allowedItems = navItems.filter((item) => {
+    if (!item.roles || !role) return true
+    return item.roles.includes(role)
+  })
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -71,7 +101,7 @@ const MobileNav = () => {
           </div>
         </div>
         <nav className="flex flex-col gap-1 px-4 py-6">
-          {navItems.map(({ label, href, icon: Icon }) => {
+          {allowedItems.map(({ label, href, icon: Icon }) => {
             const active = pathname === href
             return (
               <Link
@@ -97,19 +127,28 @@ const MobileNav = () => {
 
 export const AdminShell = ({ children }: { children: React.ReactNode }) => {
   const { admin, logout } = useAuth()
+  const pathname = usePathname()
+  const activeNav = navItems.find((item) => item.href === pathname)
+  const heading = activeNav?.label ?? 'Dashboard'
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <Sidebar />
-      <div className="flex flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-4 backdrop-blur dark:border-slate-800 dark:bg-slate-900/70">
+    <div className="flex h-screen w-full overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <div className="hidden lg:block lg:h-full lg:w-64 lg:overflow-hidden lg:bg-white lg:dark:bg-slate-900">
+        <div className="h-full">
+          <Sidebar />
+        </div>
+      </div>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <header className="z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 px-4 backdrop-blur dark:border-slate-800 dark:bg-slate-900/70">
           <div className="flex items-center gap-2">
             <MobileNav />
-            <h1 className="text-base font-semibold tracking-tight text-slate-900 dark:text-white">Dashboard</h1>
+            <h1 className="text-base font-semibold tracking-tight text-slate-900 dark:text-white">{heading}</h1>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex flex-col text-right">
               <span className="text-sm font-semibold text-slate-900 dark:text-white">{admin?.name}</span>
-              <span className="text-xs uppercase tracking-[0.2em] text-[#BD5A00]">{admin?.role}</span>
+              <span className="text-xs uppercase tracking-[0.2em] text-[#BD5A00]">
+                {admin?.role ? ROLE_LABELS[admin.role] : ''}
+              </span>
             </div>
             <Button variant="outline" size="sm" onClick={logout} className="gap-2 border-[#BD5A00] text-[#BD5A00]">
               <LogOut className="h-4 w-4" />
