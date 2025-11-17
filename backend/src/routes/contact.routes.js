@@ -14,7 +14,7 @@ const router = express.Router()
 
 const contactLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 5,
+  max: 5000,
   standardHeaders: true,
   legacyHeaders: false,
 })

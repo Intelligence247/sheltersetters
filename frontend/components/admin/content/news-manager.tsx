@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { CalendarHeart, Loader2, Pencil, Plus, Trash2 } from 'lucide-react'
+import { CalendarHeart, Loader2, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { useAuth } from '@/components/admin/auth-context'
@@ -39,6 +39,8 @@ type NewsFormState = {
   body: string
   imageUrl: string
   altText: string
+  gallery: Array<{ url: string; alt: string }>
+  authorName: string
   publishedAt: string
   isFeatured: boolean
   tags: string
@@ -50,6 +52,8 @@ const initialForm: NewsFormState = {
   body: '',
   imageUrl: '',
   altText: '',
+  gallery: [],
+  authorName: '',
   publishedAt: '',
   isFeatured: false,
   tags: '',
@@ -78,6 +82,7 @@ export const NewsManager = () => {
   const [form, setForm] = useState<NewsFormState>(initialForm)
   const [submitting, setSubmitting] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [uploadingGallery, setUploadingGallery] = useState(false)
 
   const fetchNews = useCallback(async () => {
     setLoading(true)
@@ -123,6 +128,50 @@ export const NewsManager = () => {
     }
   }
 
+  const handleGalleryUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+    setUploadingGallery(true)
+    try {
+      const uploadPromises = Array.from(files).map((file) =>
+        uploadAdminImage(request, file, { folder: 'news' })
+      )
+      const results = await Promise.all(uploadPromises)
+      const newGalleryItems = results.map((result) => ({
+        url: result.url,
+        alt: '',
+      }))
+      setForm((prev) => ({
+        ...prev,
+        gallery: [...prev.gallery, ...newGalleryItems],
+      }))
+      toast.success('Gallery images uploaded', {
+        description: `${results.length} image(s) added to gallery.`,
+      })
+    } catch (error: any) {
+      toast.error('Gallery upload failed', {
+        description: error?.body?.message || 'Please try again shortly.',
+      })
+    } finally {
+      setUploadingGallery(false)
+      event.target.value = ''
+    }
+  }
+
+  const removeGalleryImage = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, i) => i !== index),
+    }))
+  }
+
+  const updateGalleryAlt = (index: number, alt: string) => {
+    setForm((prev) => ({
+      ...prev,
+      gallery: prev.gallery.map((item, i) => (i === index ? { ...item, alt } : item)),
+    }))
+  }
+
   const openEdit = (article: NewsArticle) => {
     setEditing(article)
     setForm({
@@ -131,6 +180,8 @@ export const NewsManager = () => {
       body: article.body ?? '',
       imageUrl: article.imageUrl ?? '',
       altText: article.altText ?? '',
+      gallery: article.gallery ?? [],
+      authorName: article.authorName ?? '',
       publishedAt: toDateTimeLocal(article.publishedAt),
       isFeatured: article.isFeatured,
       tags: (article.tags ?? []).join(', '),
@@ -153,6 +204,8 @@ export const NewsManager = () => {
       body: form.body,
       imageUrl: form.imageUrl,
       altText: form.altText,
+      gallery: form.gallery.filter((item) => item.url.trim() !== ''),
+      authorName: form.authorName,
       publishedAt: fromDateTimeLocal(form.publishedAt || new Date().toISOString()),
       isFeatured: form.isFeatured,
       tags: form.tags
@@ -258,15 +311,22 @@ export const NewsManager = () => {
                   <Textarea id="summary" name="summary" value={form.summary} onChange={handleChange} rows={3} required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="body">Body</Label>
+                  <Label htmlFor="body">
+                    Full article body
+                    <span className="text-xs text-slate-500 ml-2">(This will be displayed on the detailed article page)</span>
+                  </Label>
                   <Textarea
                     id="body"
                     name="body"
                     value={form.body}
                     onChange={handleChange}
-                    placeholder="Full story (optional)"
-                    rows={5}
+                    placeholder="Write the full detailed story here. This content will be shown when users click 'Read More' on the article..."
+                    rows={8}
+                    className="resize-y"
                   />
+                  <p className="text-xs text-slate-500">
+                    The body content is displayed on the detailed article page. You can use multiple paragraphs by separating them with line breaks.
+                  </p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
@@ -321,6 +381,60 @@ export const NewsManager = () => {
                       placeholder="Separate tags with commas"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="authorName">Author name</Label>
+                    <Input
+                      id="authorName"
+                      name="authorName"
+                      value={form.authorName}
+                      onChange={handleChange}
+                      placeholder="Article author"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Gallery images</Label>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleGalleryUpload}
+                      disabled={uploadingGallery}
+                    />
+                    {uploadingGallery && <Loader2 className="h-4 w-4 animate-spin text-[#BD5A00]" />}
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Upload multiple images to create a gallery for the article.
+                  </p>
+                  {form.gallery.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                      {form.gallery.map((item, index) => (
+                        <div key={index} className="relative group">
+                          <div className="overflow-hidden rounded-lg border border-slate-200">
+                            <img src={item.url} alt={item.alt || `Gallery image ${index + 1}`} className="h-32 w-full object-cover" />
+                          </div>
+                          <div className="mt-2 space-y-1">
+                            <Input
+                              placeholder="Alt text"
+                              value={item.alt}
+                              onChange={(e) => updateGalleryAlt(index, e.target.value)}
+                              className="text-xs"
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="absolute top-2 right-2 h-6 w-6 bg-red-500 hover:bg-red-600 text-white border-0"
+                            onClick={() => removeGalleryImage(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-800/60">
                   <div>

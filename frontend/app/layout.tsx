@@ -104,7 +104,7 @@ export default function RootLayout({
               sameAs: [
                 "https://www.facebook.com/sheltersetters",
                 "https://www.twitter.com/sheltersetters",
-                "https://www.linkedin.com/company/sheltersetters",
+                "https://www.linkedin.com/in/shelter-setters-aluminium-experts-7906a715b",
               ],
               aggregateRating: {
                 "@type": "AggregateRating",

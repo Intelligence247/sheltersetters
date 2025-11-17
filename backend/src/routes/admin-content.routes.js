@@ -6,6 +6,7 @@ const {
   updateService,
   deleteService,
   listNews,
+  getNews,
   createNews,
   updateNews,
   deleteNews,
@@ -56,6 +57,7 @@ router.delete(
 
 // News
 router.get("/news", listNews)
+router.get("/news/:id", [param("id").notEmpty().withMessage("ID is required")], validateRequest, getNews)
 router.post(
   "/news",
   [

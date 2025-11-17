@@ -17,10 +17,17 @@ export interface Service {
 export interface NewsArticle {
   _id: string
   headline: string
+  slug?: string
   summary: string
   body?: string
   imageUrl?: string
   altText?: string
+  gallery?: Array<{
+    url: string
+    alt?: string
+  }>
+  authorName?: string
+  readingTime?: number
   publishedAt: string
   isFeatured: boolean
   tags?: string[]

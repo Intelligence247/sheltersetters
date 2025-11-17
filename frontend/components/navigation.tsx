@@ -1,12 +1,17 @@
 "use client"
 
 import { useState } from "react"
+import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import Image from "next/image"
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
+  
+  // Check if we're on a news page
+  const isNewsPage = pathname?.startsWith("/news")
 
   return (
     <nav className="navigation-bar fixed top-0 z-50 w-full border-b shadow-sm transition-colors duration-300">
@@ -32,28 +37,35 @@ export default function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden items-center gap-8 md:flex">
             <Link
-              href="#services"
+              href="/#services"
               className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
             >
               Services
             </Link>
             <Link
-              href="#about"
+              href="/#about"
               className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
             >
               About
             </Link>
             <Link
-              href="#projects"
+              href="/#projects"
               className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
             >
               Projects
             </Link>
             <Link
-              href="#contact"
+              href="/#contact"
               className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
             >
               Contact
+            </Link>
+            <Link
+              href="/news"
+              className="navigation-link text-sm font-medium transition-colors hover:text-[#BD5A00]"
+              style={isNewsPage ? { color: "#F0A500", fontWeight: 600 } : undefined}
+            >
+              News
             </Link>
           </div>
 
@@ -98,6 +110,13 @@ export default function Navigation() {
               className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
             >
               About
+            </Link>
+            <Link
+              href="/news"
+              className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
+              style={isNewsPage ? { color: "#F0A500", fontWeight: 600, backgroundColor: "rgba(240, 165, 0, 0.1)" } : undefined}
+            >
+              News
             </Link>
             <Link
               href="#contact"

@@ -99,28 +99,32 @@ export default function Footer() {
           {/* Social Links */}
           <div className="flex gap-4 mb-6">
             <a
-              href="#"
+              href="https://web.facebook.com/SSAENigeria"
+              target="_blank"
               aria-label="Facebook"
               className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[#BD5A00]"
             >
               <Facebook className="w-5 h-5" />
             </a>
             <a
-              href="#"
+              href="https://x.com/ssaluminiumltd"
+              target="_blank"
               aria-label="Twitter"
               className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[#BD5A00]"
             >
               <Twitter className="w-5 h-5" />
             </a>
             <a
-              href="#"
+              href="https://www.linkedin.com/in/shelter-setters-aluminium-experts-7906a715b/"
+              target="_blank"
               aria-label="LinkedIn"
               className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[#BD5A00]"
             >
               <Linkedin className="w-5 h-5" />
             </a>
             <a
-              href="#"
+              href="https://www.instagram.com/sheltersetters"
+              target="_blank"
               aria-label="Instagram"
               className="w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-[#BD5A00]"
             >

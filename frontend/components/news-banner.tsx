@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { format } from "date-fns"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
+import Link from "next/link"
 
 import { API_BASE_URL } from "@/lib/config"
 import { cn } from "@/lib/utils"
@@ -244,10 +245,10 @@ export default function NewsBanner() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
               {displayItems.map((item, index) => (
-                <article
+                <Link
                   key={item.id}
-                  className="card overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer"
-                  onClick={() => goToSlide((currentIndex + index) % newsItems.length)}
+                  href={`/news/${item.id}`}
+                  className="card overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer block"
                 >
                   {/* Image Container */}
                   <div className="relative h-48 mb-4 overflow-hidden rounded-lg bg-gray-200">
@@ -264,7 +265,6 @@ export default function NewsBanner() {
                   <div className="flex-1 flex flex-col gap-3">
                     <h3
                       className="font-bold text-base md:text-lg line-clamp-2 group-hover:text-[#BD5A00] transition-colors"
-                      style={{ color: "var(--color-primary-900)" }}
                     >
                       {item.headline}
                     </h3>
@@ -280,24 +280,17 @@ export default function NewsBanner() {
                       <span className="body-sm" style={{ color: "var(--neutral-500)" }}>
                         {item.date}
                       </span>
-                      <a
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                        }}
+                      <span
                         className={cn(
-                          "btn-primary text-sm py-1 px-3",
+                          "btn-primary text-sm py-1 px-3 inline-block",
                           "disabled:opacity-60 disabled:pointer-events-none"
                         )}
-                        aria-label={`Read more about ${item.headline}`}
-                        tabIndex={-1}
                       >
                         Read More
-                      </a>
+                      </span>
                     </div>
                   </div>
-                </article>
+                </Link>
               ))}
             </div>
           )}

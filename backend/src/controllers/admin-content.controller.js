@@ -51,11 +51,26 @@ const listNews = asyncHandler(async (_req, res) => {
   return makeResponse(res, StatusCodes.OK, { news })
 })
 
+const getNews = asyncHandler(async (req, res) => {
+  const { id } = req.params
+  const article = await NewsArticle.findOne({
+    $or: [{ _id: id }, { slug: id }],
+  })
+  if (!article) {
+    throw new ApiError(StatusCodes.NOT_FOUND, "News article not found")
+  }
+  return makeResponse(res, StatusCodes.OK, { article })
+})
+
 const createNews = asyncHandler(async (req, res) => {
   const payload = {
     ...req.body,
     createdBy: req.user._id,
     updatedBy: req.user._id,
+  }
+  // If authorName is not provided, try to get it from the user
+  if (!payload.authorName && req.user.name) {
+    payload.authorName = req.user.name
   }
   const article = await NewsArticle.create(payload)
   return makeResponse(res, StatusCodes.CREATED, { article }, "News article created")
@@ -65,6 +80,10 @@ const updateNews = asyncHandler(async (req, res) => {
   const payload = {
     ...req.body,
     updatedBy: req.user._id,
+  }
+  // If authorName is not provided, try to get it from the user
+  if (!payload.authorName && req.user.name) {
+    payload.authorName = req.user.name
   }
   const article = await NewsArticle.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true })
   if (!article) {
@@ -159,6 +178,7 @@ module.exports = {
   updateService,
   deleteService,
   listNews,
+  getNews,
   createNews,
   updateNews,
   deleteNews,
