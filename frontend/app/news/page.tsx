@@ -295,7 +295,7 @@ export default function NewsPage() {
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
           {/* Section Header */}
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="heading-lg mb-4" style={{ color: "var(--color-primary-900)" }}>
+            <h2 className="heading-lg mb-4">
               All News Articles
             </h2>
             <p className="body-lg max-w-2xl mx-auto" style={{ color: "var(--text-secondary)" }}>
