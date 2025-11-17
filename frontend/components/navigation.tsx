@@ -18,7 +18,9 @@ export default function Navigation() {
       <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
+          <Link 
+           onClick={() => setIsOpen(!isOpen)}
+           href="/" className="flex items-center gap-3">
             <div className="flex items-center gap-3 transition-colors">
               <div className="flex h-16 w-16 items-center justify-center">
                 <Image src={"/official-logo2.png"} alt="Shelter Setters logo" height={64} width={64} className="object-contain object-center scale-[1.25]" />
@@ -94,24 +96,28 @@ export default function Navigation() {
         {isOpen && (
           <div className="mobile-menu space-y-3 border-t pb-4 transition-colors md:hidden">
             <Link
-              href="#services"
+             onClick={() => setIsOpen(!isOpen)}
+              href="/#services"
               className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
             >
               Services
             </Link>
             <Link
-              href="#projects"
+             onClick={() => setIsOpen(!isOpen)}
+              href="/#projects"
               className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
             >
               Projects
             </Link>
             <Link
-              href="#about"
+             onClick={() => setIsOpen(!isOpen)}
+              href="/#about"
               className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
             >
               About
             </Link>
             <Link
+             onClick={() => setIsOpen(!isOpen)}
               href="/news"
               className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
               style={isNewsPage ? { color: "#F0A500", fontWeight: 600, backgroundColor: "rgba(240, 165, 0, 0.1)" } : undefined}
@@ -119,12 +125,15 @@ export default function Navigation() {
               News
             </Link>
             <Link
-              href="#contact"
+             onClick={() => setIsOpen(!isOpen)}
+              href="/#contact"
               className="mobile-nav-link block rounded-lg px-4 py-2 transition-colors"
             >
               Contact
             </Link>
-            <Link href="#contact" className="block btn-primary">
+            <Link
+             onClick={() => setIsOpen(!isOpen)}
+            href="/#contact" className="block btn-primary">
               Request Quote
             </Link>
           </div>
