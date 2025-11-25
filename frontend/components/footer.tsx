@@ -29,22 +29,22 @@ export default function Footer() {
             <h4 className="font-bold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="#services" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/#services" className="text-white/70 hover:text-white transition-colors">
                   Services
                 </Link>
               </li>
               <li>
-                <Link href="#projects" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/#projects" className="text-white/70 hover:text-white transition-colors">
                   Projects
                 </Link>
               </li>
               <li>
-                <Link href="#about" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/#about" className="text-white/70 hover:text-white transition-colors">
                   About
                 </Link>
               </li>
               <li>
-                <Link href="#contact" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/#contact" className="text-white/70 hover:text-white transition-colors">
                   Contact
                 </Link>
               </li>
@@ -56,22 +56,22 @@ export default function Footer() {
             <h4 className="font-bold mb-4">Services</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#roofing" className="text-white/70 hover:text-white transition-colors">
+                <a href="/#roofing" className="text-white/70 hover:text-white transition-colors">
                   Roofing Sheets
                 </a>
               </li>
               <li>
-                <a href="#windows" className="text-white/70 hover:text-white transition-colors">
+                <a href="/#windows" className="text-white/70 hover:text-white transition-colors">
                   Window Fabrication
                 </a>
               </li>
               <li>
-                <a href="#partitions" className="text-white/70 hover:text-white transition-colors">
+                <a href="/#partitions" className="text-white/70 hover:text-white transition-colors">
                   Glass Partitions
                 </a>
               </li>
               <li>
-                <a href="#interior" className="text-white/70 hover:text-white transition-colors">
+                <a href="/#interior" className="text-white/70 hover:text-white transition-colors">
                   Interior Finishing
                 </a>
               </li>

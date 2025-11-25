@@ -63,7 +63,7 @@ export default function ServicesGrid() {
           {services.map((service) => {
             const Icon = service.icon
             return (
-              <div key={service.id} className="card services-card group cursor-pointer overflow-hidden">
+              <div key={service.id} id={service.id} className="card services-card group cursor-pointer overflow-hidden">
                 <div className="services-image relative mb-4 h-48 overflow-hidden rounded-lg">
                   <img
                     src={service.image || "/placeholder.svg"}

@@ -1,0 +1,72 @@
+const path = require("path")
+const dotenv = require("dotenv")
+
+dotenv.config({
+  path: path.resolve(process.cwd(), ".env"),
+})
+
+const parseBoolean = (value, fallback = false) => {
+  if (value === undefined) return fallback
+  return ["true", "1", "yes"].includes(String(value).toLowerCase())
+}
+
+const parseNumber = (value, fallback) => {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+const commaSeparatedToArray = (value) => {
+  if (!value) return []
+  if (Array.isArray(value)) return value
+  return String(value)
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+const environment = process.env.NODE_ENV || "development"
+
+const config = {
+  env: environment,
+  port: parseNumber(process.env.PORT, 5000),
+  corsOrigin: process.env.CORS_ORIGIN || "http://localhost:3000",
+  cors: {
+    origin: commaSeparatedToArray(process.env.CORS_ORIGIN || "http://localhost:3000"),
+    credentials: true,
+  },
+  security: {
+    rateLimitWindowMs: parseNumber(process.env.RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000),
+    rateLimitMax: parseNumber(process.env.RATE_LIMIT_MAX, 100000),
+  },
+  jwt: {
+    secret: process.env.JWT_SECRET || "change-me",
+    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+    refreshSecret: process.env.JWT_REFRESH_SECRET || `${process.env.JWT_SECRET || "change-me"}-refresh`,
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "30d",
+  },
+  email: {
+    host: process.env.EMAIL_HOST,
+    port: parseNumber(process.env.EMAIL_PORT, 587),
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+    from: process.env.EMAIL_FROM,
+    fromName: process.env.EMAIL_FROM_NAME || "Shelter Setters",
+    secure: parseBoolean(process.env.EMAIL_SECURE, false),
+  },
+  publicUrls: {
+    backend: process.env.BACKEND_PUBLIC_URL || "http://localhost:5000",
+  },
+  uploads: {
+    maxFileSizeMb: parseNumber(process.env.UPLOAD_MAX_FILE_SIZE_MB, 5),
+    allowedFormats: commaSeparatedToArray(process.env.UPLOAD_ALLOWED_FORMATS) || ["jpg", "jpeg", "png", "webp"],
+    dir: process.env.UPLOAD_DIR || "public/uploads",
+  },
+  admin: {
+    registrationSecret: process.env.ADMIN_REGISTRATION_SECRET,
+  },
+  auth: {
+    passwordResetTokenExpiryMinutes: parseNumber(process.env.PASSWORD_RESET_TOKEN_EXPIRY_MINUTES, 60),
+  },
+}
+
+module.exports = config

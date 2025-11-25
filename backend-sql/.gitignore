@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Logs
+logs/
+*.log
+server.log
+npm-debug.log*
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Uploads (keep structure, ignore files)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build
+dist/
+build/
+
+# PM2
+.pm2/
+
+# Temporary files
+*.tmp
+*.temp
+
+env.example
+DEPLOYMENT.md
