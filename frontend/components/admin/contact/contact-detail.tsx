@@ -70,7 +70,7 @@ export const ContactDetail = ({ message, onUpdateStatus, onSendReply, sending }:
   }
 
   return (
-    <div className="flex h-full flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+    <div className="sticky top-0 h-full max-h-[calc(100vh-10rem)] flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
       <div className="flex flex-col gap-4 border-b border-slate-200 pb-4 dark:border-slate-800">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

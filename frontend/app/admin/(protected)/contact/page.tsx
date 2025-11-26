@@ -188,7 +188,35 @@ export default function AdminContactDesk() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      {/* Mobile: show list or detail based on selection */}
+      <div className="block xl:hidden">
+        {selected ? (
+          <div className="space-y-4">
+            <button
+              onClick={() => setSelected(null)}
+              className="inline-flex items-center gap-2 text-sm text-[#BD5A00] hover:underline"
+            >
+              ← Back to messages
+            </button>
+            <ContactDetail
+              message={selected}
+              onUpdateStatus={(status) => handleStatusChange(selected._id, status)}
+              onSendReply={(payload) => handleReply(selected._id, payload)}
+              sending={sendingReply || updating}
+            />
+          </div>
+        ) : (
+          <ContactTable
+            messages={messages}
+            onSelect={setSelected}
+            selectedId={null}
+            loading={loading}
+          />
+        )}
+      </div>
+
+      {/* Desktop/Tablet: side-by-side layout */}
+      <div className="hidden xl:grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <ContactTable
           messages={messages}
           onSelect={setSelected}

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { formatDistanceToNow } from 'date-fns'
-import { Mail, Phone } from 'lucide-react'
+import { Mail, Phone, ChevronRight } from 'lucide-react'
 
 import type { ContactMessage, ContactStatus } from '@/types/contact'
 import { Badge } from '@/components/ui/badge'
@@ -40,7 +40,60 @@ export const ContactTable = ({ messages, onSelect, selectedId, loading }: Contac
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-      <div className="overflow-x-auto">
+      {/* Mobile card view */}
+      <div className="block md:hidden divide-y divide-slate-200 dark:divide-slate-800">
+        {messages.map((message) => {
+          const active = selectedId === message._id
+          return (
+            <div
+              key={message._id}
+              className={cn(
+                'cursor-pointer p-4 transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/40',
+                active && 'bg-[#0E293B]/5 dark:bg-[#0E293B]/10'
+              )}
+              onClick={() => onSelect(message)}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-semibold text-[#0E293B] dark:text-white truncate">
+                      {message.name}
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className={cn('border text-[10px] font-semibold uppercase tracking-wider shrink-0', statusBadge[message.status])}
+                    >
+                      {message.status.replace('_', ' ')}
+                    </Badge>
+                  </div>
+                  <p className="line-clamp-2 text-xs text-slate-500 dark:text-slate-400 mb-2">
+                    {message.message}
+                  </p>
+                  <div className="flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-300">
+                    <span className="inline-flex items-center gap-2 truncate">
+                      <Mail className="h-3 w-3 text-[#BD5A00] shrink-0" />
+                      <span className="truncate">{message.email}</span>
+                    </span>
+                    {message.phone && (
+                      <span className="inline-flex items-center gap-2">
+                        <Phone className="h-3 w-3 text-[#BD5A00] shrink-0" />
+                        {message.phone}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2">
+                    {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
+                  </p>
+                </div>
+                <ChevronRight className="h-5 w-5 text-slate-400 shrink-0 mt-1" />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
           <thead className="bg-slate-50/60 text-left uppercase tracking-[0.25em] text-slate-400 dark:bg-slate-900/40 dark:text-slate-500">
             <tr>

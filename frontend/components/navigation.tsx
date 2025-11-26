@@ -73,7 +73,7 @@ export default function Navigation() {
 
           {/* Desktop CTA */}
           <div className="hidden md:block">
-            <Link href="#contact" className="btn-primary">
+            <Link href="/#contact" className="btn-primary">
               Request Quote
             </Link>
           </div>

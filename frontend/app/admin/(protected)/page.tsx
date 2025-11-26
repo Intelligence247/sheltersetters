@@ -205,7 +205,7 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <Card className="h-max sticky top-0 border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
           <CardHeader>
             <CardTitle className="text-lg text-[#0E293B] dark:text-white">Need assistance?</CardTitle>
             <CardDescription className="text-sm text-slate-500">
@@ -213,7 +213,7 @@ export default function AdminDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
-            <p>Email: support@sheltersetters.com</p>
+            <p>Email: info@sheltersetters.com</p>
             <p>Phone: +234 901 447 6652</p>
             <p className="text-xs uppercase tracking-[0.3em] text-[#BD5A00]">We’re here to help</p>
           </CardContent>

@@ -87,8 +87,8 @@ export default function Footer() {
               </a>
             </p>
             <p className="text-sm text-white/70">
-              <a href="mailto:info.ssaeltd@gmail.com" className="hover:text-white transition-colors">
-                info.ssaeltd@gmail.com
+              <a href="mailto:info@sheltersetters.com" className="hover:text-white transition-colors">
+              info@sheltersetters.com
               </a>
             </p>
           </div>

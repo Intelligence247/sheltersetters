@@ -89,7 +89,7 @@ export default function RootLayout({
                 "Premium aluminium production, roofing sheets, window fabrication, and building finishing services",
               url: "https://sheltersetters.com",
               telephone: "+234-9072629100",
-              email: "info.ssaeltd@gmail.com",
+              email: "info@sheltersetters.com",
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "Plot 4/6 Shelter Setters Street, Off Hajj Camp Road",

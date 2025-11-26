@@ -120,8 +120,8 @@ export default function ContactSection() {
                 <div>
                   <h3 className="contact-title mb-2 text-lg font-bold">Email</h3>
                   <p className="contact-text body-base">
-                    <a href="mailto:info.ssaeltd@gmail.com" className="hover:underline">
-                      info.ssaeltd@gmail.com
+                    <a href="mailto:info@sheltersetters.com" className="hover:underline">
+                    info@sheltersetters.com
                     </a>
                   </p>
                 </div>
