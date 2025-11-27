@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { Filter, Mail, RefreshCcw } from 'lucide-react'
+import { Mail, RefreshCcw, Search } from 'lucide-react'
 
 import type { ContactMessage, ContactStatus, ContactListResult } from '@/types/contact'
 import type { ApiResponse } from '@/types/api'
@@ -11,6 +11,7 @@ import { ContactDetail } from '@/components/admin/contact/contact-detail'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { RoleGate } from '@/components/admin/role-gate'
 
@@ -26,6 +27,7 @@ export default function AdminContactDesk() {
   const [messages, setMessages] = useState<ContactMessage[]>([])
   const [selected, setSelected] = useState<ContactMessage | null>(null)
   const [statusFilter, setStatusFilter] = useState<ContactStatus | 'all'>('all')
+  const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [sendingReply, setSendingReply] = useState(false)
   const [updating, setUpdating] = useState(false)
@@ -117,8 +119,21 @@ export default function AdminContactDesk() {
     }
   }
 
+  // Filter messages by search query (client-side)
+  const filteredMessages = useMemo(() => {
+    if (!searchQuery.trim()) return messages
+    const query = searchQuery.toLowerCase()
+    return messages.filter(
+      (msg) =>
+        msg.name.toLowerCase().includes(query) ||
+        msg.email.toLowerCase().includes(query) ||
+        msg.message.toLowerCase().includes(query) ||
+        (msg.phone && msg.phone.includes(query))
+    )
+  }, [messages, searchQuery])
+
   const summaryCounts = useMemo(() => {
-    return messages.reduce(
+    return filteredMessages.reduce(
       (acc, message) => {
         acc.total += 1
         acc[message.status] += 1
@@ -126,7 +141,7 @@ export default function AdminContactDesk() {
       },
       { total: 0, new: 0, in_progress: 0, closed: 0 } as Record<ContactStatus | 'total', number>
     )
-  }, [messages])
+  }, [filteredMessages])
 
   return (
     <RoleGate allowed={['super_admin', 'customer_care']}>
@@ -143,8 +158,18 @@ export default function AdminContactDesk() {
             </CardDescription>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                type="text"
+                placeholder="Search name, email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-[180px] pl-9 border-slate-200 focus:border-[#BD5A00] focus:ring-[#BD5A00]/20 dark:border-slate-700"
+              />
+            </div>
             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ContactStatus | 'all')}>
-              <SelectTrigger className="w-[170px] border-slate-200 focus:border-[#BD5A00] focus:ring-[#BD5A00]/20 dark:border-slate-700">
+              <SelectTrigger className="w-[140px] border-slate-200 focus:border-[#BD5A00] focus:ring-[#BD5A00]/20 dark:border-slate-700">
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
               <SelectContent>
@@ -207,7 +232,7 @@ export default function AdminContactDesk() {
           </div>
         ) : (
           <ContactTable
-            messages={messages}
+            messages={filteredMessages}
             onSelect={setSelected}
             selectedId={null}
             loading={loading}
@@ -218,7 +243,7 @@ export default function AdminContactDesk() {
       {/* Desktop/Tablet: side-by-side layout */}
       <div className="hidden xl:grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <ContactTable
-          messages={messages}
+          messages={filteredMessages}
           onSelect={setSelected}
           selectedId={selected?._id ?? null}
           loading={loading}

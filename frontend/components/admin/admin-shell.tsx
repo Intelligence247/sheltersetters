@@ -78,6 +78,7 @@ const MobileNav = () => {
   const pathname = usePathname()
   const { admin } = useAuth()
   const role = admin?.role
+  const [open, setOpen] = React.useState(false)
 
   const allowedItems = navItems.filter((item) => {
     if (!item.roles || !role) return true
@@ -85,7 +86,7 @@ const MobileNav = () => {
   })
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="outline" size="icon" className="lg:hidden">
           <Menu className="h-5 w-5" />
@@ -107,6 +108,7 @@ const MobileNav = () => {
               <Link
                 key={href}
                 href={href}
+                onClick={() => setOpen(false)}
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   active
